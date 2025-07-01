@@ -1,16 +1,16 @@
 local message = Instance.new("Message", workspace)
 message.Text = "Backdoor made by wanna die? credited by pepsi hub owner: Ghostin138"
-wait(1)
+wait(3)
 message:Destroy()
 
 local message = Instance.new("Message", workspace)
 message.Text = "Thanks for using Mole Backdoor ;)"
-wait(1)
+wait(3)
 message:Destroy()
 
 local message = Instance.new("Message", workspace)
 message.Text = "Pepsi Hub: https://discord.gg/WWw7U83mpJ"
-wait(1)
+wait(5)
 message:Destroy()
 
 -- Instances: 12 | Scripts: 3 | Modules: 0 | Tags: 0
