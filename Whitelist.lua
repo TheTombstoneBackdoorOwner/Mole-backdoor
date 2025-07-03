@@ -1,5 +1,5 @@
 local whitelisted = {
-    owner = true,
+    owner = true
     0001 = true
 }
 
