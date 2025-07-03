@@ -1,5 +1,5 @@
 local whitelisted = {
-    Owner = true
+    owner = true
 }
 
 local gui = Instance.new("ScreenGui")
