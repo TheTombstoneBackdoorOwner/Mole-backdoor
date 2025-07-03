@@ -16,7 +16,6 @@ Main.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
 Main.BorderSizePixel = 0
 Main.AnchorPoint = Vector2.new(0.5, 0.5)
 Main.Parent = UI
-
 Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
 
 local TopBar = Instance.new("Frame")
@@ -27,13 +26,39 @@ TopBar.Parent = Main
 Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 12)
 
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 1, 0)
+Title.Size = UDim2.new(1, -100, 1, 0)
+Title.Position = UDim2.new(0, 10, 0, 0)
 Title.BackgroundTransparency = 1
 Title.Text = "Mole Backdoor"
 Title.Font = Enum.Font.GothamSemibold
 Title.TextColor3 = Color3.fromRGB(240, 240, 240)
 Title.TextSize = 18
+Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = TopBar
+
+local MinBtn = Instance.new("TextButton")
+MinBtn.Size = UDim2.new(0, 40, 1, 0)
+MinBtn.Position = UDim2.new(1, -90, 0, 0)
+MinBtn.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+MinBtn.Text = "-"
+MinBtn.TextColor3 = Color3.fromRGB(220, 220, 220)
+MinBtn.Font = Enum.Font.GothamBold
+MinBtn.TextSize = 20
+MinBtn.BorderSizePixel = 0
+MinBtn.Parent = TopBar
+Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 6)
+
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 40, 1, 0)
+CloseBtn.Position = UDim2.new(1, -45, 0, 0)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(36, 20, 20)
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.fromRGB(240, 100, 100)
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextSize = 18
+CloseBtn.BorderSizePixel = 0
+CloseBtn.Parent = TopBar
+Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
 
 local Editor = Instance.new("TextBox")
 Editor.Size = UDim2.new(1, -120, 1, -60)
@@ -71,9 +96,7 @@ local function createButton(text, yOffset)
 	Btn.BorderSizePixel = 0
 	Btn.AutoButtonColor = false
 	Btn.Parent = ButtonHolder
-
-	local Corner = Instance.new("UICorner", Btn)
-	Corner.CornerRadius = UDim.new(0, 8)
+	Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 8)
 
 	Btn.MouseEnter:Connect(function()
 		TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(90, 160, 255)}):Play()
@@ -115,7 +138,7 @@ end
 ExecuteBtn.MouseButton1Click:Connect(function()
 	local text = Editor.Text
 	if text ~= "" then
-		local success = findAndFire(text)
+		findAndFire(text)
 	end
 end)
 
@@ -125,17 +148,16 @@ end)
 
 local dragging, dragStart, startPos
 
-TopBar.InputBegan:Connect(function(input)
+Main.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
 		dragging = true
 		dragStart = input.Position
 		startPos = Main.Position
-	end
-end)
-
-TopBar.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = false
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
 	end
 end)
 
@@ -150,3 +172,26 @@ UserInputService.InputChanged:Connect(function(input)
 		)
 	end
 end)
+
+local minimized = false
+
+local function toggleMinimize()
+	minimized = not minimized
+	Editor.Visible = not minimized
+	ButtonHolder.Visible = not minimized
+	Main.Size = minimized and UDim2.new(0, 480, 0, 60) or UDim2.new(0, 480, 0, 340)
+end
+
+MinBtn.MouseButton1Click:Connect(toggleMinimize)
+CloseBtn.MouseButton1Click:Connect(function()
+	UI:Destroy()
+end)
+
+-- Save minimize state
+local function saveMinimized()
+	if setclipboard then
+		setclipboard(tostring(minimized))
+	end
+end
+
+game:BindToClose(saveMinimized)
