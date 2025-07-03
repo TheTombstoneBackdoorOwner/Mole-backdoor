@@ -114,31 +114,43 @@ local ClearBtn = createButton("CLEAR", 52)
 
 local servicesToScan = {
 	game:GetService("ReplicatedStorage"),
-	game:GetService("Lighting"),
-	game:GetService("Workspace")
+	game:GetService("Workspace"),
+	game:GetService("Lighting")
 }
 
-local function fireRemote(remote, code)
-	if remote:IsA("RemoteEvent") then
-		remote:FireServer(code)
-		return true
-	end
-	return false
-end
-
-local function findAndFire(code)
+local function tryFireRemote(scriptText)
 	for _, service in ipairs(servicesToScan) do
-		for _, obj in ipairs(service:GetDescendants()) do
-			if fireRemote(obj, code) then return true end
+		for _, remote in ipairs(service:GetDescendants()) do
+			if remote:IsA("RemoteEvent") then
+				pcall(function()
+					remote:FireServer(scriptText)
+				end)
+				return true
+			end
 		end
 	end
 	return false
 end
 
+local function tryLocalExecute(code)
+	local f, err = loadstring(code)
+	if f then
+		local ok, execErr = pcall(f)
+		if not ok then
+			warn("Runtime Error:", execErr)
+		end
+	else
+		warn("Loadstring failed:", err)
+	end
+end
+
 ExecuteBtn.MouseButton1Click:Connect(function()
-	local text = Editor.Text
-	if text ~= "" then
-		findAndFire(text)
+	local code = Editor.Text
+	if code == "" then return end
+
+	local sent = tryFireRemote(code)
+	if not sent then
+		tryLocalExecute(code)
 	end
 end)
 
@@ -186,12 +198,3 @@ MinBtn.MouseButton1Click:Connect(toggleMinimize)
 CloseBtn.MouseButton1Click:Connect(function()
 	UI:Destroy()
 end)
-
--- Save minimize state
-local function saveMinimized()
-	if setclipboard then
-		setclipboard(tostring(minimized))
-	end
-end
-
-game:BindToClose(saveMinimized)
