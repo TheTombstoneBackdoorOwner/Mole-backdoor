@@ -122,10 +122,15 @@ local function tryFireRemote(scriptText)
 	for _, service in ipairs(servicesToScan) do
 		for _, remote in ipairs(service:GetDescendants()) do
 			if remote:IsA("RemoteEvent") then
-				pcall(function()
+				local success, err = pcall(function()
 					remote:FireServer(scriptText)
 				end)
-				return true
+				if success then
+					print("[Backdoor] Fired remote:", remote:GetFullName())
+					return true
+				else
+					warn("[Backdoor] Failed to fire remote:", err)
+				end
 			end
 		end
 	end
@@ -137,10 +142,12 @@ local function tryLocalExecute(code)
 	if f then
 		local ok, execErr = pcall(f)
 		if not ok then
-			warn("Runtime Error:", execErr)
+			warn("[Executor] Runtime error:", execErr)
+		else
+			print("[Executor] Code executed locally.")
 		end
 	else
-		warn("Loadstring failed:", err)
+		warn("[Executor] Loadstring error:", err)
 	end
 end
 
@@ -158,9 +165,10 @@ ClearBtn.MouseButton1Click:Connect(function()
 	Editor.Text = ""
 end)
 
+-- Dragging logic
 local dragging, dragStart, startPos
 
-Main.InputBegan:Connect(function(input)
+TopBar.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
 		dragging = true
 		dragStart = input.Position
