@@ -2,6 +2,7 @@ local whitelisted = {
     Ughuhh09 = {
         Key = "Owner"
     }
+}
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "KeyUI"
@@ -38,15 +39,15 @@ btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 btn.Parent = frame
 
 btn.MouseButton1Click:Connect(function()
-	local input = box.Text
-	local playerName = game.Players.LocalPlayer.Name
+    local input = box.Text
+    local playerName = game.Players.LocalPlayer.Name
 
-	local userEntry = whitelisted[playerName]
-	if userEntry and input == userEntry.Key then
-		gui:Destroy()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/TheTombstoneBackdoorOwner/Mole-backdoor/refs/heads/main/Mole.lua"))()
-	else
-		box.Text = ""
-		box.PlaceholderText = "Invalid key"
-	end
+    local userEntry = whitelisted[playerName]
+    if userEntry and input == userEntry.Key then
+        gui:Destroy()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/TheTombstoneBackdoorOwner/Mole-backdoor/refs/heads/main/Mole.lua"))()
+    else
+        box.Text = ""
+        box.PlaceholderText = "Invalid key"
+    end
 end)
