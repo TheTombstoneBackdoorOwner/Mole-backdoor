@@ -1,4 +1,4 @@
---// Backdoor Startup Messages
+-- Backdoor Startup Messages (unchanged)
 local function showMessage(text, duration)
     local message = Instance.new("Message", workspace)
     message.Text = text
@@ -12,39 +12,58 @@ task.spawn(function()
     showMessage("Pepsi Hub: https://discord.gg/WWw7U83mpJ", 5)
 end)
 
---// Create GUI
+-- Services
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
+-- ScreenGui
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "MoleBackdoorGUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = PlayerGui
 
+-- Main Frame (with rounded corners & subtle shadow)
 local Frame = Instance.new("Frame")
 Frame.Name = "MainFrame"
-Frame.Size = UDim2.new(0, 400, 0, 280)
+Frame.Size = UDim2.new(0, 420, 0, 320)
 Frame.Position = UDim2.new(0.3, 0, 0.3, 0)
-Frame.BackgroundColor3 = Color3.fromRGB(245, 245, 245)
-Frame.BorderColor3 = Color3.fromRGB(40, 40, 40)
-Frame.BorderSizePixel = 2
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+Frame.BorderSizePixel = 0
 Frame.Parent = ScreenGui
 
--- Title bar
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = Frame
+
+local Shadow = Instance.new("ImageLabel")
+Shadow.Name = "Shadow"
+Shadow.BackgroundTransparency = 1
+Shadow.Image = "rbxassetid://1316045217" -- subtle shadow png
+Shadow.Size = UDim2.new(1, 20, 1, 20)
+Shadow.Position = UDim2.new(0, -10, 0, -10)
+Shadow.ZIndex = 0
+Shadow.Parent = Frame
+
+-- Title Bar
 local Title = Instance.new("TextLabel")
 Title.Name = "Title"
-Title.Size = UDim2.new(1, 0, 0, 36)
-Title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Size = UDim2.new(1, 0, 0, 44)
+Title.BackgroundColor3 = Color3.fromRGB(12, 12, 18)
+Title.TextColor3 = Color3.fromRGB(230, 230, 230)
 Title.Text = "Mole SS (Backdoor)"
-Title.Font = Enum.Font.SourceSansBold
-Title.TextSize = 20
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 22
+Title.TextXAlignment = Enum.TextXAlignment.Center
 Title.Parent = Frame
 
--- Dragging functionality
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 12)
+TitleCorner.Parent = Title
+
+-- Dragging functionality (unchanged)
 local dragging, dragInput, dragStart, startPos
 
 local function update(input)
@@ -89,55 +108,65 @@ editor.Name = "ScriptEditor"
 editor.MultiLine = true
 editor.ClearTextOnFocus = false
 editor.TextWrapped = true
-editor.Font = Enum.Font.SourceSans
-editor.TextSize = 14
-editor.TextColor3 = Color3.fromRGB(0, 0, 0)
-editor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-editor.BorderColor3 = Color3.fromRGB(60, 60, 60)
-editor.BorderSizePixel = 2
-editor.Size = UDim2.new(1, -90, 1, -46)
-editor.Position = UDim2.new(0, 8, 0, 38)
+editor.Font = Enum.Font.Code
+editor.TextSize = 16
+editor.TextColor3 = Color3.fromRGB(220, 220, 220)
+editor.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+editor.BorderSizePixel = 0
+editor.Size = UDim2.new(1, -100, 1, -60)
+editor.Position = UDim2.new(0, 12, 0, 52)
 editor.TextXAlignment = Enum.TextXAlignment.Left
 editor.TextYAlignment = Enum.TextYAlignment.Top
+editor.PlaceholderText = "Enter your script here..."
 editor.Parent = Frame
+
+local editorCorner = Instance.new("UICorner")
+editorCorner.CornerRadius = UDim.new(0, 8)
+editorCorner.Parent = editor
 
 -- Buttons container
 local buttonsFrame = Instance.new("Frame")
 buttonsFrame.Name = "ButtonsFrame"
-buttonsFrame.Size = UDim2.new(0, 74, 1, -40)
-buttonsFrame.Position = UDim2.new(1, -82, 0, 38)
+buttonsFrame.Size = UDim2.new(0, 80, 1, -60)
+buttonsFrame.Position = UDim2.new(1, -90, 0, 52)
 buttonsFrame.BackgroundTransparency = 1
 buttonsFrame.Parent = Frame
 
+-- Common button style function
+local function createButton(text, positionY)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 0, 50)
+    btn.Position = UDim2.new(0, 0, 0, positionY)
+    btn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+    btn.BorderSizePixel = 0
+    btn.Font = Enum.Font.GothamBold
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(245, 245, 245)
+    btn.TextSize = 18
+    btn.Parent = buttonsFrame
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = btn
+
+    -- Hover effect
+    btn.MouseEnter:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(100, 160, 210)}):Play()
+    end)
+    btn.MouseLeave:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(70, 130, 180)}):Play()
+    end)
+
+    return btn
+end
+
 -- Execute Button
-local executeBtn = Instance.new("TextButton")
-executeBtn.Name = "ExecuteButton"
-executeBtn.Size = UDim2.new(1, 0, 0, 126)
-executeBtn.Position = UDim2.new(0, 0, 0, 0)
-executeBtn.BackgroundColor3 = Color3.fromRGB(107, 107, 107)
-executeBtn.BorderSizePixel = 1
-executeBtn.BorderColor3 = Color3.fromRGB(40, 40, 40)
-executeBtn.Font = Enum.Font.FredokaOne
-executeBtn.Text = "EXECUTE"
-executeBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
-executeBtn.TextSize = 18
-executeBtn.Parent = buttonsFrame
+local executeBtn = createButton("EXECUTE", 0)
 
 -- Clear Button
-local clearBtn = Instance.new("TextButton")
-clearBtn.Name = "ClearButton"
-clearBtn.Size = UDim2.new(1, 0, 0, 124)
-clearBtn.Position = UDim2.new(0, 0, 0, 130)
-clearBtn.BackgroundColor3 = Color3.fromRGB(107, 107, 107)
-clearBtn.BorderSizePixel = 1
-clearBtn.BorderColor3 = Color3.fromRGB(40, 40, 40)
-clearBtn.Font = Enum.Font.FredokaOne
-clearBtn.Text = "CLEAR"
-clearBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
-clearBtn.TextSize = 18
-clearBtn.Parent = buttonsFrame
+local clearBtn = createButton("CLEAR", 60)
 
--- Backdoor Remote Execution Logic
+-- Backdoor Remote Execution Logic (unchanged)
 local servicesToScan = {
     game:GetService("ReplicatedStorage"),
     game:GetService("Lighting"),
