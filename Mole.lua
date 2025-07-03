@@ -1,249 +1,189 @@
-local message = Instance.new("Message", workspace)
-message.Text = "Backdoor made by wanna die? credited by pepsi hub owner: Ghostin138"
-wait(3)
-message:Destroy()
+--// Backdoor Startup Messages
+local function showMessage(text, duration)
+    local message = Instance.new("Message", workspace)
+    message.Text = text
+    task.wait(duration)
+    message:Destroy()
+end
 
-local message = Instance.new("Message", workspace)
-message.Text = "Thanks for using Mole Backdoor ;)"
-wait(3)
-message:Destroy()
+task.spawn(function()
+    showMessage("Backdoor made by wanna die? credited by pepsi hub owner: Ghostin138", 3)
+    showMessage("Thanks for using Mole Backdoor ;)", 3)
+    showMessage("Pepsi Hub: https://discord.gg/WWw7U83mpJ", 5)
+end)
 
-local message = Instance.new("Message", workspace)
-message.Text = "Pepsi Hub: https://discord.gg/WWw7U83mpJ"
-wait(5)
-message:Destroy()
+--// Create GUI
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- Instances: 12 | Scripts: 3 | Modules: 0 | Tags: 0
-local G2L = {};
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MoleBackdoorGUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
 
--- StarterGui.ScreenGui
-G2L["1"] = Instance.new("ScreenGui", game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"));
-G2L["1"]["ZIndexBehavior"] = Enum.ZIndexBehavior.Sibling;
+local Frame = Instance.new("Frame")
+Frame.Name = "MainFrame"
+Frame.Size = UDim2.new(0, 400, 0, 280)
+Frame.Position = UDim2.new(0.3, 0, 0.3, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(245, 245, 245)
+Frame.BorderColor3 = Color3.fromRGB(40, 40, 40)
+Frame.BorderSizePixel = 2
+Frame.Parent = ScreenGui
 
+-- Title bar
+local Title = Instance.new("TextLabel")
+Title.Name = "Title"
+Title.Size = UDim2.new(1, 0, 0, 36)
+Title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Text = "Mole SS (Backdoor)"
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 20
+Title.Parent = Frame
 
--- StarterGui.ScreenGui.Frame
-G2L["2"] = Instance.new("Frame", G2L["1"]);
-G2L["2"]["BorderSizePixel"] = 0;
-G2L["2"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["2"]["Size"] = UDim2.new(0, 369, 0, 250);
-G2L["2"]["Position"] = UDim2.new(0.13623, 0, 0.17354, 0);
-G2L["2"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+-- Dragging functionality
+local dragging, dragInput, dragStart, startPos
 
+local function update(input)
+    local delta = input.Position - dragStart
+    Frame.Position = UDim2.new(
+        startPos.X.Scale,
+        startPos.X.Offset + delta.X,
+        startPos.Y.Scale,
+        startPos.Y.Offset + delta.Y
+    )
+end
 
--- StarterGui.ScreenGui.Frame.LocalScript
-G2L["3"] = Instance.new("LocalScript", G2L["2"]);
+Title.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Frame.Position
 
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
 
+Title.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
 
--- StarterGui.ScreenGui.Frame.editor
-G2L["4"] = Instance.new("TextBox", G2L["2"]);
-G2L["4"]["Name"] = [[editor]];
-G2L["4"]["TextXAlignment"] = Enum.TextXAlignment.Left;
-G2L["4"]["BorderSizePixel"] = 3;
-G2L["4"]["TextWrapped"] = true;
-G2L["4"]["TextSize"] = 14;
-G2L["4"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["4"]["TextYAlignment"] = Enum.TextYAlignment.Top;
-G2L["4"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["4"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
-G2L["4"]["MultiLine"] = true;
-G2L["4"]["ClearTextOnFocus"] = false;
-G2L["4"]["Size"] = UDim2.new(0, 369, 0, 205);
-G2L["4"]["Position"] = UDim2.new(0, 0, 0.17844, 0);
-G2L["4"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["4"]["Text"] = [[nigg]];
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
 
+-- Script Editor TextBox
+local editor = Instance.new("TextBox")
+editor.Name = "ScriptEditor"
+editor.MultiLine = true
+editor.ClearTextOnFocus = false
+editor.TextWrapped = true
+editor.Font = Enum.Font.SourceSans
+editor.TextSize = 14
+editor.TextColor3 = Color3.fromRGB(0, 0, 0)
+editor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+editor.BorderColor3 = Color3.fromRGB(60, 60, 60)
+editor.BorderSizePixel = 2
+editor.Size = UDim2.new(1, -90, 1, -46)
+editor.Position = UDim2.new(0, 8, 0, 38)
+editor.TextXAlignment = Enum.TextXAlignment.Left
+editor.TextYAlignment = Enum.TextYAlignment.Top
+editor.Parent = Frame
 
--- StarterGui.ScreenGui.Frame.TextLabel
-G2L["5"] = Instance.new("TextLabel", G2L["2"]);
-G2L["5"]["BorderSizePixel"] = 3;
-G2L["5"]["TextSize"] = 14;
-G2L["5"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["5"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
-G2L["5"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["5"]["Size"] = UDim2.new(0, 369, 0, 44);
-G2L["5"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["5"]["Text"] = [[]];
+-- Buttons container
+local buttonsFrame = Instance.new("Frame")
+buttonsFrame.Name = "ButtonsFrame"
+buttonsFrame.Size = UDim2.new(0, 74, 1, -40)
+buttonsFrame.Position = UDim2.new(1, -82, 0, 38)
+buttonsFrame.BackgroundTransparency = 1
+buttonsFrame.Parent = Frame
 
+-- Execute Button
+local executeBtn = Instance.new("TextButton")
+executeBtn.Name = "ExecuteButton"
+executeBtn.Size = UDim2.new(1, 0, 0, 126)
+executeBtn.Position = UDim2.new(0, 0, 0, 0)
+executeBtn.BackgroundColor3 = Color3.fromRGB(107, 107, 107)
+executeBtn.BorderSizePixel = 1
+executeBtn.BorderColor3 = Color3.fromRGB(40, 40, 40)
+executeBtn.Font = Enum.Font.FredokaOne
+executeBtn.Text = "EXECUTE"
+executeBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+executeBtn.TextSize = 18
+executeBtn.Parent = buttonsFrame
 
--- StarterGui.ScreenGui.Frame.TextLabel
-G2L["6"] = Instance.new("TextLabel", G2L["2"]);
-G2L["6"]["BorderSizePixel"] = 0;
-G2L["6"]["TextSize"] = 14;
-G2L["6"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["6"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
-G2L["6"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["6"]["BackgroundTransparency"] = 1;
-G2L["6"]["Size"] = UDim2.new(0, 150, 0, 56);
-G2L["6"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["6"]["Text"] = [[Mole SS (Backdoor)]];
-G2L["6"]["Position"] = UDim2.new(0.10566, 0, -0.02796, 0);
+-- Clear Button
+local clearBtn = Instance.new("TextButton")
+clearBtn.Name = "ClearButton"
+clearBtn.Size = UDim2.new(1, 0, 0, 124)
+clearBtn.Position = UDim2.new(0, 0, 0, 130)
+clearBtn.BackgroundColor3 = Color3.fromRGB(107, 107, 107)
+clearBtn.BorderSizePixel = 1
+clearBtn.BorderColor3 = Color3.fromRGB(40, 40, 40)
+clearBtn.Font = Enum.Font.FredokaOne
+clearBtn.Text = "CLEAR"
+clearBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+clearBtn.TextSize = 18
+clearBtn.Parent = buttonsFrame
 
+-- Backdoor Remote Execution Logic
+local servicesToScan = {
+    game:GetService("ReplicatedStorage"),
+    game:GetService("Lighting"),
+    game:GetService("Workspace"),
+}
 
--- StarterGui.ScreenGui.Frame.ImageLabel
-G2L["7"] = Instance.new("ImageLabel", G2L["2"]);
-G2L["7"]["BorderSizePixel"] = 0;
-G2L["7"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["7"]["Image"] = [[rbxassetid://120447388437067]];
-G2L["7"]["Size"] = UDim2.new(0, 29, 0, 27);
-G2L["7"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["7"]["BackgroundTransparency"] = 1;
-G2L["7"]["Position"] = UDim2.new(-0.00262, 0, 0.03324, 0);
+local function fireRemote(remote, scriptText)
+    if remote:IsA("RemoteEvent") then
+        print("Firing remote:", remote.Name)
+        remote:FireServer(scriptText)
+        return true
+    end
+    return false
+end
 
+local function findAndFireBackdoor(scriptText)
+    for _, service in ipairs(servicesToScan) do
+        for _, descendant in ipairs(service:GetDescendants()) do
+            if descendant:IsA("RemoteEvent") then
+                local success = fireRemote(descendant, scriptText)
+                if success then
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
 
--- StarterGui.ScreenGui.Frame.TextLabel
-G2L["8"] = Instance.new("TextLabel", G2L["2"]);
-G2L["8"]["BorderSizePixel"] = 3;
-G2L["8"]["TextSize"] = 14;
-G2L["8"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["8"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
-G2L["8"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["8"]["Size"] = UDim2.new(0, 72, 0, 250);
-G2L["8"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["8"]["Text"] = [[]];
-G2L["8"]["Position"] = UDim2.new(0.99955, 0, 0, 0);
+-- Execute Button Behavior
+executeBtn.MouseButton1Click:Connect(function()
+    local scriptText = editor.Text
+    if scriptText == "" then
+        warn("Script editor is empty.")
+        return
+    end
 
+    local success = findAndFireBackdoor(scriptText)
+    if success then
+        warn("Backdoor remote fired successfully!")
+    else
+        warn("No backdoor remote found.")
+    end
+end)
 
--- StarterGui.ScreenGui.Frame.EXE
-G2L["9"] = Instance.new("TextButton", G2L["2"]);
-G2L["9"]["BorderSizePixel"] = 0;
-G2L["9"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["9"]["TextSize"] = 14;
-G2L["9"]["BackgroundColor3"] = Color3.fromRGB(107, 107, 107);
-G2L["9"]["FontFace"] = Font.new([[rbxasset://fonts/families/FredokaOne.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
-G2L["9"]["Size"] = UDim2.new(0, 72, 0, 126);
-G2L["9"]["Name"] = [[EXE]];
-G2L["9"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["9"]["Text"] = [[EXE]];
-G2L["9"]["Position"] = UDim2.new(0.99886, 0, 0.496, 0);
-
-
--- StarterGui.ScreenGui.Frame.EXE.LocalScript
-G2L["a"] = Instance.new("LocalScript", G2L["9"]);
-
-
-
--- StarterGui.ScreenGui.Frame.Clear
-G2L["b"] = Instance.new("TextButton", G2L["2"]);
-G2L["b"]["BorderSizePixel"] = 0;
-G2L["b"]["TextColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["b"]["TextSize"] = 14;
-G2L["b"]["BackgroundColor3"] = Color3.fromRGB(107, 107, 107);
-G2L["b"]["FontFace"] = Font.new([[rbxasset://fonts/families/FredokaOne.json]], Enum.FontWeight.Bold, Enum.FontStyle.Normal);
-G2L["b"]["Size"] = UDim2.new(0, 72, 0, 124);
-G2L["b"]["Name"] = [[Clear]];
-G2L["b"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["b"]["Text"] = [[Clear]];
-G2L["b"]["Position"] = UDim2.new(0.99886, 0, 0, 0);
-
-
--- StarterGui.ScreenGui.Frame.Clear.LocalScript
-G2L["c"] = Instance.new("LocalScript", G2L["b"]);
-
-
-
--- StarterGui.ScreenGui.Frame.LocalScript
-local function C_3()
-local script = G2L["3"];
-	function dragify(Main)
-		dragToggle = nil
-		dragSpeed = 0.95 -- You can edit this.
-		dragInput = nil
-		dragStart = nil
-		dragPos = nil
-	
-		function updateInput(input)
-			Delta = input.Position - dragStart
-			Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + Delta.X, startPos.Y.Scale, startPos.Y.Offset + Delta.Y)
-			game:GetService("TweenService"):Create(Main, TweenInfo.new(.25), {Position = Position}):Play()
-		end
-	
-		Main.InputBegan:Connect(function(input)
-			if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-				dragToggle = true
-				dragStart = input.Position
-				startPos = Main.Position
-				input.Changed:Connect(function()
-					if (input.UserInputState == Enum.UserInputState.End) then
-						dragToggle = false
-					end
-				end)
-			end
-		end)
-	
-		Main.InputChanged:Connect(function(input)
-			if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-				dragInput = input
-			end
-		end)
-	
-		game:GetService("UserInputService").InputChanged:Connect(function(input)
-			if (input == dragInput and dragToggle) then
-				updateInput(input)
-			end
-		end)
-	end
-	
-	dragify(script.Parent)
-end;
-task.spawn(C_3);
--- StarterGui.ScreenGui.Frame.EXE.LocalScript
-local function C_a()
-local script = G2L["a"];
-	local button = script.Parent
-	local editor = script.Parent.Parent.editor
-	local services = {game:GetService("ReplicatedStorage"), game:GetService("Lighting"), game:GetService("Workspace")}
-	
-	
-	local function FireRemote(remote)
-		if remote:IsA("RemoteEvent") then
-			print("Verificando:", remote.Name)
-			remote:FireServer(editor.Text)
-		end
-	end
-	
-	local function findBackdoorRemote()
-		for _, service in ipairs(services) do
-			for _, v in pairs(service:GetDescendants()) do
-				if v:IsA("RemoteEvent") then
-					local backdoor = FireRemote(v)
-					if backdoor then
-						return backdoor
-					end
-				end
-			end
-		end
-		return nil
-	end
-	
-	local backdoorRemote = findBackdoorRemote()
-	
-	if backdoorRemote then
-		warn("No backdoors!")
-		backdoorRemote:FireServer(editor.Text)
-	else
-	
-		local StarterGui = game:GetService("StarterGui") 
-	   print("Backdoor found!")
-	end
-	
-	button.MouseButton1Click:Connect(function()
-		findBackdoorRemote()
-	end)
-	
-end;
-task.spawn(C_a);
--- StarterGui.ScreenGui.Frame.Clear.LocalScript
-local function C_c()
-local script = G2L["c"];
-	local button = script.Parent
-	local editor = script.Parent.Parent.editor
-	
-	button.MouseButton1Click:Connect(function()
-		editor.Text = ""
-	end)
-	
-end;
-task.spawn(C_c);
-
-return G2L["1"], require;
+-- Clear Button Behavior
+clearBtn.MouseButton1Click:Connect(function()
+    editor.Text = ""
+end)
