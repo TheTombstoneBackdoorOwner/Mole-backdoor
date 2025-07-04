@@ -5,6 +5,11 @@ local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
+local message = Instance.new("Message", workspace)
+message.Text = "Thanks for using Mole ss (DISCORD: https://discord.gg/jzYpRg3vqX)"
+wait(1) -- Change the number for how long is should stay for.
+message:Destroy() -- Remove the wait and destroy for it always stay.
+
 -- UI Setup
 local UI = Instance.new("ScreenGui")
 UI.Name = "BackdoorUI"
