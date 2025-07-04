@@ -1,9 +1,12 @@
+-- Services
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
+-- UI Setup
 local UI = Instance.new("ScreenGui")
 UI.Name = "BackdoorUI"
 UI.ResetOnSpawn = false
@@ -84,6 +87,7 @@ ButtonHolder.Position = UDim2.new(1, -100, 0, 50)
 ButtonHolder.BackgroundTransparency = 1
 ButtonHolder.Parent = Main
 
+-- Create Buttons
 local function createButton(text, yOffset)
 	local Btn = Instance.new("TextButton")
 	Btn.Size = UDim2.new(1, 0, 0, 44)
@@ -101,7 +105,6 @@ local function createButton(text, yOffset)
 	Btn.MouseEnter:Connect(function()
 		TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(90, 160, 255)}):Play()
 	end)
-
 	Btn.MouseLeave:Connect(function()
 		TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(60, 130, 230)}):Play()
 	end)
@@ -112,6 +115,7 @@ end
 local ExecuteBtn = createButton("EXECUTE", 0)
 local ClearBtn = createButton("CLEAR", 52)
 
+-- Remote search and executor
 local servicesToScan = {
 	game:GetService("ReplicatedStorage"),
 	game:GetService("Workspace"),
@@ -119,6 +123,7 @@ local servicesToScan = {
 }
 
 local function tryFireRemote(scriptText)
+	local sent = false
 	for _, service in ipairs(servicesToScan) do
 		for _, remote in ipairs(service:GetDescendants()) do
 			if remote:IsA("RemoteEvent") then
@@ -127,17 +132,23 @@ local function tryFireRemote(scriptText)
 				end)
 				if success then
 					print("[Backdoor] Fired remote:", remote:GetFullName())
-					return true
+					sent = true
 				else
 					warn("[Backdoor] Failed to fire remote:", err)
 				end
 			end
 		end
 	end
-	return false
+	return sent
 end
 
+-- Fallback local executor
 local function tryLocalExecute(code)
+	if not loadstring then
+		warn("[Executor] Loadstring not supported in this environment.")
+		return
+	end
+
 	local f, err = loadstring(code)
 	if f then
 		local ok, execErr = pcall(f)
@@ -151,6 +162,7 @@ local function tryLocalExecute(code)
 	end
 end
 
+-- Button events
 ExecuteBtn.MouseButton1Click:Connect(function()
 	local code = Editor.Text
 	if code == "" then return end
@@ -165,19 +177,15 @@ ClearBtn.MouseButton1Click:Connect(function()
 	Editor.Text = ""
 end)
 
--- Dragging logic
-local dragging, dragStart, startPos
+-- Dragging
+local dragging = false
+local dragStart, startPos
 
 TopBar.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
 		dragging = true
 		dragStart = input.Position
 		startPos = Main.Position
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
 	end
 end)
 
@@ -185,16 +193,20 @@ UserInputService.InputChanged:Connect(function(input)
 	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
 		local delta = input.Position - dragStart
 		Main.Position = UDim2.new(
-			startPos.X.Scale,
-			startPos.X.Offset + delta.X,
-			startPos.Y.Scale,
-			startPos.Y.Offset + delta.Y
+			startPos.X.Scale, startPos.X.Offset + delta.X,
+			startPos.Y.Scale, startPos.Y.Offset + delta.Y
 		)
 	end
 end)
 
-local minimized = false
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
 
+-- Minimize & Close
+local minimized = false
 local function toggleMinimize()
 	minimized = not minimized
 	Editor.Visible = not minimized
