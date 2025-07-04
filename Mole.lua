@@ -173,13 +173,13 @@ message:Destroy()
 	},
 
 	["Utility"] = {
-		["Print Hello"] = [[print("Hello from Script Hub!")]]
+		["Print Hello"] = [[print("Made by Wanna Die? (Put your own print here)")]]
 	},
 
 	["Exploit"] = {
 		["Polaria Loader"] = {
 			code = [[
-require(123255432303221):Pload(game.Players.LocalPlayer)
+require(123255432303221):Pload("Yournamehere")
 ]],
 			dangerous = true
 		}
@@ -203,7 +203,7 @@ require(123255432303221):Pload(game.Players.LocalPlayer)
 				end
 			end
 		},
-		["Made by Wanna Die ❤️"] = [[-- Respect the creator]]
+		["Made by Wanna Die?"] = [[-- Respect the creator]]
 	}
 }
 
