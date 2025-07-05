@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
@@ -77,9 +78,7 @@ local function createTabButton(name, yPos)
     btn.Parent = TabPanel
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
     btn.MouseEnter:Connect(function()
-        if btn ~= selectedTabButton then
-            TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(70, 70, 90)}):Play()
-        end
+        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(70, 70, 90)}):Play()
     end)
     btn.MouseLeave:Connect(function()
         if btn ~= selectedTabButton then
@@ -287,8 +286,8 @@ local function selectTab(name)
 end
 
 TabButtons["Editor"] = createTabButton("Editor", 10)
-TabButtons["Script Hub"] = createTabButton("Script Hub", 60)
-TabButtons["Settings"] = createTabButton("Settings", 110)
+TabButtons["Script Hub"] = createTabButton("Script Hub", 70)
+TabButtons["Settings"] = createTabButton("Settings", 130)
 
 for tabName, btn in pairs(TabButtons) do
     btn.MouseButton1Click:Connect(function()
@@ -299,16 +298,14 @@ for tabName, btn in pairs(TabButtons) do
     end)
 end
 
-CloseBtn.MouseButton1Click:Connect(function()
-    UI:Destroy()
-end)
+selectTab("Editor")
 
 ExecuteBtn.MouseButton1Click:Connect(function()
-    local func, err = loadstring(Editor.Text)
-    if func then
-        func()
-    else
-        warn("Error in script: "..err)
+    local success, err = pcall(function()
+        loadstring(Editor.Text)()
+    end)
+    if not success then
+        warn("Script execution error: "..err)
     end
 end)
 
@@ -316,5 +313,59 @@ ClearBtn.MouseButton1Click:Connect(function()
     Editor.Text = ""
 end)
 
--- == Initialize with Editor tab selected ==
-selectTab("Editor")
+local isDarkTheme = true
+local function toggleTheme()
+    if isDarkTheme then
+        Main.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+        TopBar.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+        TabPanel.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
+        EditorFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        ScriptHubFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        SettingsFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        Editor.BackgroundColor3 = Color3.fromRGB(245, 245, 245)
+        Editor.TextColor3 = Color3.fromRGB(10, 10, 10)
+        for _, btn in pairs(TabButtons) do
+            btn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+            btn.TextColor3 = Color3.fromRGB(20, 20, 20)
+        end
+        ExecuteBtn.BackgroundColor3 = Color3.fromRGB(100, 150, 250)
+        ClearBtn.BackgroundColor3 = Color3.fromRGB(100, 150, 250)
+        ToggleThemeBtn.BackgroundColor3 = Color3.fromRGB(100, 150, 250)
+        CloseBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+        CloseBtn.TextColor3 = Color3.fromRGB(250, 200, 200)
+    else
+        Main.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+        TopBar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+        TabPanel.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+        EditorFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+        ScriptHubFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+        SettingsFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+        Editor.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+        Editor.TextColor3 = Color3.fromRGB(235, 235, 235)
+        for _, btn in pairs(TabButtons) do
+            btn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        end
+        ExecuteBtn.BackgroundColor3 = Color3.fromRGB(60, 130, 230)
+        ClearBtn.BackgroundColor3 = Color3.fromRGB(60, 130, 230)
+        ToggleThemeBtn.BackgroundColor3 = Color3.fromRGB(60, 130, 230)
+        CloseBtn.BackgroundColor3 = Color3.fromRGB(36, 20, 20)
+        CloseBtn.TextColor3 = Color3.fromRGB(240, 100, 100)
+    end
+    isDarkTheme = not isDarkTheme
+end
+
+ToggleThemeBtn.MouseButton1Click:Connect(toggleTheme)
+
+CloseBtn.MouseButton1Click:Connect(function()
+    UI:Destroy()
+end)
+
+local UIVisible = true
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.RightControl then
+        UIVisible = not UIVisible
+        UI.Enabled = UIVisible
+    end
+end)
