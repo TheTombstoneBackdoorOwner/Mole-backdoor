@@ -1,14 +1,7 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-
-local message = Instance.new("Message", workspace)
-message.Text = "Thanks for using Fuse SS (DISCORD: https://discord.gg/jzYpRg3vqX)"
-wait(1) -- Change the number for how long is should stay for.
-message:Destroy() -- Remove the wait and destroy for it always stay.
 
 -- UI Setup
 local UI = Instance.new("ScreenGui")
@@ -17,13 +10,12 @@ UI.ResetOnSpawn = false
 UI.Parent = PlayerGui
 
 local Main = Instance.new("Frame")
-Main.Size = UDim2.new(0, 480, 0, 340)
-Main.Position = UDim2.new(0.5, -240, 0.5, -170)
+Main.Size = UDim2.new(0, 480, 0, 380) -- taller to fit tabs + content
+Main.Position = UDim2.new(0.5, -240, 0.5, -190)
 Main.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
 Main.BorderSizePixel = 0
 Main.AnchorPoint = Vector2.new(0.5, 0.5)
 Main.Parent = UI
-Main.Draggable = true
 Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
 
 local TopBar = Instance.new("Frame")
@@ -68,9 +60,49 @@ CloseBtn.BorderSizePixel = 0
 CloseBtn.Parent = TopBar
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
 
+-- Tab Buttons Holder
+local TabHolder = Instance.new("Frame")
+TabHolder.Size = UDim2.new(1, -20, 0, 36)
+TabHolder.Position = UDim2.new(0, 10, 0, 45)
+TabHolder.BackgroundTransparency = 1
+TabHolder.Parent = Main
+
+local function createTabButton(text, position)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 100, 1, 0)
+    btn.Position = position
+    btn.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+    btn.TextColor3 = Color3.fromRGB(180, 180, 180)
+    btn.Text = text
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 16
+    btn.BorderSizePixel = 0
+    btn.Parent = TabHolder
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+    return btn
+end
+
+local EditorTabBtn = createTabButton("Editor", UDim2.new(0, 0, 0, 0))
+local ScriptHubTabBtn = createTabButton("Script Hub", UDim2.new(0, 110, 0, 0))
+
+-- Content Frames inside Main (overlapping, only one visible)
+local ContentHolder = Instance.new("Frame")
+ContentHolder.Size = UDim2.new(1, -20, 1, -95)
+ContentHolder.Position = UDim2.new(0, 10, 0, 85)
+ContentHolder.BackgroundTransparency = 1
+ContentHolder.ClipsDescendants = true
+ContentHolder.Parent = Main
+
+-- Editor Content
+local EditorContent = Instance.new("Frame")
+EditorContent.Size = UDim2.new(1, 0, 1, 0)
+EditorContent.Position = UDim2.new(0, 0, 0, 0)
+EditorContent.BackgroundTransparency = 1
+EditorContent.Parent = ContentHolder
+
 local Editor = Instance.new("TextBox")
-Editor.Size = UDim2.new(1, -120, 1, -60)
-Editor.Position = UDim2.new(0, 20, 0, 50)
+Editor.Size = UDim2.new(1, -120, 1, 0)
+Editor.Position = UDim2.new(0, 0, 0, 0)
 Editor.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
 Editor.TextColor3 = Color3.fromRGB(235, 235, 235)
 Editor.Font = Enum.Font.Code
@@ -83,16 +115,15 @@ Editor.PlaceholderText = "Write your script..."
 Editor.TextWrapped = true
 Editor.Text = ""
 Editor.BorderSizePixel = 0
-Editor.Parent = Main
+Editor.Parent = EditorContent
 Instance.new("UICorner", Editor).CornerRadius = UDim.new(0, 8)
 
 local ButtonHolder = Instance.new("Frame")
-ButtonHolder.Size = UDim2.new(0, 90, 1, -60)
-ButtonHolder.Position = UDim2.new(1, -100, 0, 50)
+ButtonHolder.Size = UDim2.new(0, 90, 1, 0)
+ButtonHolder.Position = UDim2.new(1, -90, 0, 0)
 ButtonHolder.BackgroundTransparency = 1
-ButtonHolder.Parent = Main
+ButtonHolder.Parent = EditorContent
 
--- Buttons: Execute, Clear, Script Hub
 local function createButton(text, yOffset)
   local Btn = Instance.new("TextButton")
   Btn.Size = UDim2.new(1, 0, 0, 44)
@@ -119,24 +150,21 @@ end
 
 local ExecuteBtn = createButton("EXECUTE", 0)
 local ClearBtn = createButton("CLEAR", 52)
-local ScriptHubBtn = createButton("SCRIPT HUB", 104)
 
--- === Script Hub UI ===
-local HubFrame = Instance.new("Frame")
-HubFrame.Size = UDim2.new(0, 320, 0, 300)
-HubFrame.Position = UDim2.new(0.5, 250, 0.5, -150)
-HubFrame.AnchorPoint = Vector2.new(0, 0.5)
-HubFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
-HubFrame.BorderSizePixel = 0
-HubFrame.Visible = false
-HubFrame.Parent = UI
-Instance.new("UICorner", HubFrame).CornerRadius = UDim.new(0, 10)
+-- Script Hub Content
+local ScriptHubContent = Instance.new("Frame")
+ScriptHubContent.Size = UDim2.new(1, 0, 1, 0)
+ScriptHubContent.Position = UDim2.new(0, 0, 1, 0) -- Start off-screen (below)
+ScriptHubContent.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+ScriptHubContent.BorderSizePixel = 0
+ScriptHubContent.Parent = ContentHolder
+Instance.new("UICorner", ScriptHubContent).CornerRadius = UDim.new(0, 10)
 
 local HubTopBar = Instance.new("Frame")
 HubTopBar.Size = UDim2.new(1, 0, 0, 30)
 HubTopBar.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
 HubTopBar.BorderSizePixel = 0
-HubTopBar.Parent = HubFrame
+HubTopBar.Parent = ScriptHubContent
 Instance.new("UICorner", HubTopBar).CornerRadius = UDim.new(0, 10)
 
 local HubTitle = Instance.new("TextLabel")
@@ -155,7 +183,7 @@ ScriptList.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
 ScriptList.BorderSizePixel = 0
 ScriptList.CanvasSize = UDim2.new(0, 0, 5, 0)
 ScriptList.ScrollBarThickness = 8
-ScriptList.Parent = HubFrame
+ScriptList.Parent = ScriptHubContent
 Instance.new("UICorner", ScriptList).CornerRadius = UDim.new(0, 8)
 
 local UIListLayout = Instance.new("UIListLayout")
@@ -163,8 +191,9 @@ UIListLayout.Padding = UDim.new(0, 6)
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UIListLayout.Parent = ScriptList
 
--- Scripts Table
+-- Your existing scripts table here (omitted for brevity) --
 local scripts = {
+  -- same as your previous scripts table
   ["Troll"] = {
    ["Hint Message"] = [[
 local hint = Instance.new("Hint", workspace)
@@ -177,11 +206,9 @@ wait(1)
 message:Destroy()
 ]]
   },
-
   ["Utility"] = {
    ["Print Hello"] = [[print("Made by Wanna Die? (Put your own print here)")]]
   },
-
   ["Exploit"] = {
    ["Polaria Loader"] = {
     code = [[
@@ -190,7 +217,6 @@ require(123255432303221):Pload("Yournamehere")
     dangerous = true
    }
   },
-
   ["⚙ Settings"] = {
    ["Toggle Dark Theme"] = {
     action = function()
@@ -248,50 +274,61 @@ for categoryName, categoryScripts in pairs(scripts) do
       print("⚠️ Polaria script loaded (risky).")
      end
      Editor.Text = code
-     HubFrame.Visible = false
+     switchToTab("Editor") -- auto switch to editor tab on selecting script
     end
    end)
   end
 end
 
--- === REMOTE EXECUTOR ===
-local servicesToScan = {
- game:GetService("ReplicatedStorage"),
- game:GetService("Workspace"),
- game:GetService("Lighting")
-}
+-- Helper to tween tab switch
+local currentTab = "Editor"
+local tweenTime = 0.3
 
-local function tryFireRemote(scriptText)
- local sent = false
- for _, service in ipairs(servicesToScan) do
-  for _, remote in ipairs(service:GetDescendants()) do
-   if remote:IsA("RemoteEvent") then
-    local success, err = pcall(function()
-     remote:FireServer(scriptText)
-    end)
-    if success then sent = true end
-   elseif remote:IsA("RemoteFunction") then
-    local success, err = pcall(function()
-     remote:InvokeServer(scriptText)
-    end)
-    if success then sent = true end
-   end
-  end
+local function switchToTab(tabName)
+ if tabName == currentTab then return end
+
+ if tabName == "Editor" then
+  -- Editor slides from below to visible, ScriptHub slides down out
+  TweenService:Create(EditorContent, TweenInfo.new(tweenTime), {Position = UDim2.new(0, 0, 0, 0)}):Play()
+  TweenService:Create(ScriptHubContent, TweenInfo.new(tweenTime), {Position = UDim2.new(0, 0, 1, 0)}):Play()
+
+  EditorTabBtn.BackgroundColor3 = Color3.fromRGB(60, 130, 230)
+  EditorTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+  ScriptHubTabBtn.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+  ScriptHubTabBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+
+ elseif tabName == "Script Hub" then
+  -- ScriptHub slides up visible, Editor slides up out
+  TweenService:Create(EditorContent, TweenInfo.new(tweenTime), {Position = UDim2.new(0, 0, -1, 0)}):Play()
+  TweenService:Create(ScriptHubContent, TweenInfo.new(tweenTime), {Position = UDim2.new(0, 0, 0, 0)}):Play()
+
+  ScriptHubTabBtn.BackgroundColor3 = Color3.fromRGB(60, 130, 230)
+  ScriptHubTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+  EditorTabBtn.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+  EditorTabBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
  end
- return sent
+
+ currentTab = tabName
 end
 
--- Button Actions
+-- Initialize tab colors
+switchToTab("Editor")
+
+EditorTabBtn.MouseButton1Click:Connect(function()
+ switchToTab("Editor")
+end)
+
+ScriptHubTabBtn.MouseButton1Click:Connect(function()
+ switchToTab("Script Hub")
+end)
+
+-- Buttons functionality
 ExecuteBtn.MouseButton1Click:Connect(function()
- local scriptText = Editor.Text
  local success, err = pcall(function()
-  loadstring(scriptText)()
+  loadstring(Editor.Text)()
  end)
  if not success then
-  local remoteSuccess = tryFireRemote(scriptText)
-  if not remoteSuccess then
-   warn("Script failed to run locally and remotely.")
-  end
+  warn("Error executing script:", err)
  end
 end)
 
@@ -299,82 +336,56 @@ ClearBtn.MouseButton1Click:Connect(function()
  Editor.Text = ""
 end)
 
-ScriptHubBtn.MouseButton1Click:Connect(function()
- HubFrame.Visible = not HubFrame.Visible
+-- Minimize & Close buttons
+local minimized = false
+MinBtn.MouseButton1Click:Connect(function()
+ if minimized then
+  Main.Size = UDim2.new(0, 480, 0, 380)
+  ContentHolder.Visible = true
+ else
+  Main.Size = UDim2.new(0, 480, 0, 40)
+  ContentHolder.Visible = false
+ end
+ minimized = not minimized
 end)
 
 CloseBtn.MouseButton1Click:Connect(function()
  UI:Destroy()
 end)
 
-MinBtn.MouseButton1Click:Connect(function()
- if Main.Size.Y.Offset == 40 then
-  Main.Size = UDim2.new(0, 480, 0, 340)
-  Editor.Visible = true
-  ButtonHolder.Visible = true
- else
-  Main.Size = UDim2.new(0, 480, 0, 40)
-  Editor.Visible = false
-  ButtonHolder.Visible = false
-  HubFrame.Visible = false
+-- Dragging functionality on Main frame (drag whole UI)
+local UserInputService = game:GetService("UserInputService")
+
+local dragging, dragInput, dragStart, startPos
+
+local function update(input)
+ local delta = input.Position - dragStart
+ Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+                         startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+Main.InputBegan:Connect(function(input)
+ if input.UserInputType == Enum.UserInputType.MouseButton1 then
+  dragging = true
+  dragStart = input.Position
+  startPos = Main.Position
+
+  input.Changed:Connect(function()
+   if input.UserInputState == Enum.UserInputState.End then
+    dragging = false
+   end
+  end)
  end
 end)
 
--- Improved Fully Draggable Function (draggable anywhere on all descendants)
-local function makeFullyDraggable(frame)
-    frame.Active = true
-    frame.Selectable = true
+Main.InputChanged:Connect(function(input)
+ if input.UserInputType == Enum.UserInputType.MouseMovement then
+  dragInput = input
+ end
+end)
 
-    local dragging = false
-    local dragStartPos = nil
-    local frameStartPos = nil
-
-    local function onInputBegan(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStartPos = input.Position
-            frameStartPos = frame.Position
-
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end
-
-    local function onInputChanged(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStartPos
-            frame.Position = UDim2.new(
-                frameStartPos.X.Scale,
-                frameStartPos.X.Offset + delta.X,
-                frameStartPos.Y.Scale,
-                frameStartPos.Y.Offset + delta.Y
-            )
-        end
-    end
-
-    local function connectGuiObject(guiObj)
-        guiObj.InputBegan:Connect(onInputBegan)
-        guiObj.InputChanged:Connect(onInputChanged)
-    end
-
-    connectGuiObject(frame)
-
-    for _, child in ipairs(frame:GetDescendants()) do
-        if child:IsA("GuiObject") then
-            connectGuiObject(child)
-        end
-    end
-
-    frame.DescendantAdded:Connect(function(child)
-        if child:IsA("GuiObject") then
-            connectGuiObject(child)
-        end
-    end)
-end
-
--- Apply draggable to both Main and HubFrame
-makeFullyDraggable(Main)
-makeFullyDraggable(HubFrame)
+UserInputService.InputChanged:Connect(function(input)
+ if input == dragInput and dragging then
+  update(input)
+ end
+end)
