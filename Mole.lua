@@ -7,7 +7,7 @@ local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
 local message = Instance.new("Message", workspace)
-message.Text = "Thanks for using Smoke SS (DISCORD: https://discord.gg/jzYpRg3vqX)"
+message.Text = "Thanks for using Smoke SS"
 wait(1)
 message:Destroy()
 
