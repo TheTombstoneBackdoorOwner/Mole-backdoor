@@ -283,10 +283,10 @@ end
 TabButtons.Editor = createTabButton("Editor", 10)
 TabButtons.Editor.Name = "Editor"
 
-TabButtons.ScriptHub = createTabButton("Script Hub", 64)
-TabButtons.ScriptHub.Name = "Script Hub"
+TabButtons.ScriptHub = createTabButton("Script Hub(Soon)", 64)
+TabButtons.ScriptHub.Name = "Script Hub(Soon)"
 
-TabButtons.Settings = createTabButton("Settings", 118)
+TabButtons.Settings = createTabButton("Settings(Soon)", 118)
 TabButtons.Settings.Name = "Settings"
 
 local selectedTabButton = nil
