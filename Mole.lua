@@ -6,12 +6,12 @@ local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
 local message = Instance.new("Message", workspace)
-message.Text = "Thanks for using Fuse SS (DISCORD: https://discord.gg/jzYpRg3vqX)"
+message.Text = "Thanks for using Smoke SS (DISCORD: https://discord.gg/jzYpRg3vqX)"
 wait(1)
 message:Destroy()
 
 local UI = Instance.new("ScreenGui")
-UI.Name = "FuseBackdoor"
+UI.Name = "SmokeBackdoor"
 UI.ResetOnSpawn = false
 UI.Parent = PlayerGui
 
@@ -36,7 +36,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, -90, 1, 0)
 Title.Position = UDim2.new(0, 10, 0, 0)
 Title.BackgroundTransparency = 1
-Title.Text = "Fuse Backdoor"
+Title.Text = "Smoke Backdoor"
 Title.Font = Enum.Font.GothamSemibold
 Title.TextColor3 = Color3.fromRGB(240, 240, 240)
 Title.TextSize = 18
