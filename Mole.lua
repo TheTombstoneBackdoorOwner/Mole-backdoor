@@ -22,6 +22,7 @@ Main.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
 Main.BorderSizePixel = 0
 Main.AnchorPoint = Vector2.new(0.5, 0.5)
 Main.Parent = UI
+Main.Active = true
 Main.Draggable = true
 Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
 
@@ -30,6 +31,8 @@ TopBar.Size = UDim2.new(1, 0, 0, 40)
 TopBar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
 TopBar.BorderSizePixel = 0
 TopBar.Parent = Main
+TopBar.Active = true
+TopBar.Draggable = true
 Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 12)
 
 local Title = Instance.new("TextLabel")
@@ -61,6 +64,8 @@ TabPanel.Position = UDim2.new(0, 0, 0, 40)
 TabPanel.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
 TabPanel.BorderSizePixel = 0
 TabPanel.Parent = Main
+TabPanel.Active = true
+TabPanel.Draggable = true
 Instance.new("UICorner", TabPanel).CornerRadius = UDim.new(0, 12)
 
 local TabButtons = {}
@@ -94,6 +99,8 @@ EditorFrame.Position = UDim2.new(0, 120, 0, 40)
 EditorFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
 EditorFrame.BorderSizePixel = 0
 EditorFrame.Parent = Main
+EditorFrame.Active = true
+EditorFrame.Draggable = true
 Instance.new("UICorner", EditorFrame).CornerRadius = UDim.new(0, 12)
 
 local ScriptHubFrame = Instance.new("Frame")
@@ -103,6 +110,8 @@ ScriptHubFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
 ScriptHubFrame.BorderSizePixel = 0
 ScriptHubFrame.Parent = Main
 ScriptHubFrame.Visible = false
+ScriptHubFrame.Active = true
+ScriptHubFrame.Draggable = true
 Instance.new("UICorner", ScriptHubFrame).CornerRadius = UDim.new(0, 12)
 
 local SettingsFrame = Instance.new("Frame")
@@ -112,6 +121,8 @@ SettingsFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
 SettingsFrame.BorderSizePixel = 0
 SettingsFrame.Parent = Main
 SettingsFrame.Visible = false
+SettingsFrame.Active = true
+SettingsFrame.Draggable = true
 Instance.new("UICorner", SettingsFrame).CornerRadius = UDim.new(0, 12)
 
 local Editor = Instance.new("TextBox")
@@ -137,6 +148,8 @@ EditorButtons.Size = UDim2.new(1, -40, 0, 50)
 EditorButtons.Position = UDim2.new(0, 20, 1, -60)
 EditorButtons.BackgroundTransparency = 1
 EditorButtons.Parent = EditorFrame
+EditorButtons.Active = true
+EditorButtons.Draggable = true
 
 local function createEditorButton(text, positionX)
     local btn = Instance.new("TextButton")
@@ -259,103 +272,80 @@ local function populateScriptHub()
         CatBtn.MouseLeave:Connect(function()
             TweenService:Create(CatBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}):Play()
         end)
-        CatBtn.MouseButton1Click:Connect(function()
-            clearScriptList()
-            for scriptName, scriptData in pairs(scriptsInCategory) do
-                createScriptButton(scriptName, scriptData)
-            end
-        end)
+
+        for scriptName, scriptData in pairs(scriptsInCategory) do
+            createScriptButton(scriptName, scriptData)
+        end
     end
+    ScriptList.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y + 10)
 end
 
 local selectedTabButton = nil
-local function selectTab(name)
-    for tabName, btn in pairs(TabButtons) do
-        btn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+
+local function selectTab(tabName)
+    if selectedTabButton then
+        TweenService:Create(selectedTabButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}):Play()
     end
-
-    if TabButtons[name] then
-        TabButtons[name].BackgroundColor3 = Color3.fromRGB(70, 70, 90)
+    if tabName == "Editor" then
+        EditorFrame.Visible = true
+        ScriptHubFrame.Visible = false
+        SettingsFrame.Visible = false
+        selectedTabButton = TabButtons["Editor"]
+    elseif tabName == "Script Hub" then
+        EditorFrame.Visible = false
+        ScriptHubFrame.Visible = true
+        SettingsFrame.Visible = false
+        selectedTabButton = TabButtons["Script Hub"]
+    elseif tabName == "Settings" then
+        EditorFrame.Visible = false
+        ScriptHubFrame.Visible = false
+        SettingsFrame.Visible = true
+        selectedTabButton = TabButtons["Settings"]
     end
-
-    selectedTabButton = TabButtons[name]
-
-    EditorFrame.Visible = (name == "Editor")
-    ScriptHubFrame.Visible = (name == "Script Hub")
-    SettingsFrame.Visible = (name == "Settings")
+    TweenService:Create(selectedTabButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(70, 70, 90)}):Play()
 end
 
--- Create Tab Buttons
-TabButtons["Editor"] = createTabButton("Editor", 20)
-TabButtons["Script Hub"] = createTabButton("Script Hub", 74)
-TabButtons["Settings"] = createTabButton("Settings", 128)
+TabButtons["Editor"] = createTabButton("Editor", 10)
+TabButtons["Script Hub"] = createTabButton("Script Hub", 64)
+TabButtons["Settings"] = createTabButton("Settings", 118)
 
 for name, btn in pairs(TabButtons) do
     btn.MouseButton1Click:Connect(function()
         selectTab(name)
-        if name == "Script Hub" then
-            populateScriptHub()
-        end
     end)
 end
 
-selectTab("Editor")
-
--- Status bar
-local StatusBar = Instance.new("Frame")
-StatusBar.Size = UDim2.new(1, 0, 0, 25)
-StatusBar.Position = UDim2.new(0, 0, 1, -25)
-StatusBar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
-StatusBar.Parent = Main
-Instance.new("UICorner", StatusBar).CornerRadius = UDim.new(0, 12)
-
-local StatusText = Instance.new("TextLabel")
-StatusText.Size = UDim2.new(1, 0, 1, 0)
-StatusText.BackgroundTransparency = 1
-StatusText.TextColor3 = Color3.fromRGB(235, 235, 235)
-StatusText.Font = Enum.Font.Gotham
-StatusText.TextSize = 14
-StatusText.Text = "Ready"
-StatusText.Parent = StatusBar
-
--- Buttons functionality
+CloseBtn.MouseButton1Click:Connect(function()
+    UI:Destroy()
+end)
 
 ExecuteBtn.MouseButton1Click:Connect(function()
-    StatusText.Text = "Executing..."
-
-    local remote = game:GetService("ReplicatedStorage"):FindFirstChild("RemoteEvent")
-    
-    if remote then
-        remote:FireServer(Editor.Text)
-        StatusText.Text = "Script sent to server!"
+    local scriptText = Editor.Text
+    local func, err = loadstring(scriptText)
+    if func then
+        local success, execErr = pcall(func)
+        if not success then
+            warn("Execution error: "..execErr)
+        end
     else
-        StatusText.Text = "Error: RemoteEvent not found"
+        warn("Loadstring error: "..err)
     end
-    
-    wait(2)
-    StatusText.Text = "Ready"
 end)
 
 ClearBtn.MouseButton1Click:Connect(function()
     Editor.Text = ""
-    StatusText.Text = "Editor cleared"
-    wait(1)
-    StatusText.Text = "Ready"
 end)
 
 ToggleThemeBtn.MouseButton1Click:Connect(function()
-    -- Simple toggle dark/light theme (example)
-    local bg = Main.BackgroundColor3
-    if bg == Color3.fromRGB(22, 22, 28) then
-        Main.BackgroundColor3 = Color3.fromRGB(235, 235, 235)
+    if Main.BackgroundColor3 == Color3.fromRGB(22, 22, 28) then
+        Main.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
         TopBar.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-        TabPanel.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
-        EditorFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
-        ScriptHubFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
-        SettingsFrame.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+        TabPanel.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+        EditorFrame.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+        ScriptHubFrame.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+        SettingsFrame.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
         Editor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        Editor.TextColor3 = Color3.fromRGB(0, 0, 0)
-        StatusText.TextColor3 = Color3.fromRGB(0, 0, 0)
+        Editor.TextColor3 = Color3.fromRGB(30, 30, 30)
     else
         Main.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
         TopBar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
@@ -365,10 +355,8 @@ ToggleThemeBtn.MouseButton1Click:Connect(function()
         SettingsFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
         Editor.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
         Editor.TextColor3 = Color3.fromRGB(235, 235, 235)
-        StatusText.TextColor3 = Color3.fromRGB(235, 235, 235)
     end
 end)
 
-CloseBtn.MouseButton1Click:Connect(function()
-    UI:Destroy()
-end)
+populateScriptHub()
+selectTab("Editor")
