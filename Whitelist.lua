@@ -6,6 +6,7 @@ local localPlayer = Players.LocalPlayer
 local whitelisted = {
     ["owner"] = true,
     ["0001"] = true,
+    ["xlpax"] = true
 }
 
 local gui = Instance.new("ScreenGui")
