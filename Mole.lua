@@ -274,23 +274,37 @@ local function populateScriptHub()
             TweenService:Create(CatBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}):Play()
         end)
 
-        for scriptName, scriptData in pairs(scriptsInCategory) do
-            createScriptButton(scriptName, scriptData)
+        for scriptName, scriptContent in pairs(scriptsInCategory) do
+            createScriptButton(scriptName, scriptContent)
         end
     end
-    ScriptList.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y + 10)
 end
 
-local selectedTabButton = nil
+-- Tab buttons creation
+TabButtons.Editor = createTabButton("Editor", 10)
+TabButtons.Editor.Name = "Editor"
+
+TabButtons.ScriptHub = createTabButton("Script Hub", 64)
+TabButtons.ScriptHub.Name = "Script Hub"
+
+TabButtons.Settings = createTabButton("Settings", 118)
+TabButtons.Settings.Name = "Settings"
+
+local selectedTabButton
 
 local function selectTab(tabName)
     if selectedTabButton then
         TweenService:Create(selectedTabButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}):Play()
     end
+
+    selectedTabButton = nil
+
     for _, btn in pairs(TabButtons) do
         if btn.Name == tabName then
             selectedTabButton = btn
             TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(60, 130, 230)}):Play()
+        else
+            TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}):Play()
         end
     end
 
@@ -299,30 +313,18 @@ local function selectTab(tabName)
     SettingsFrame.Visible = (tabName == "Settings")
 end
 
-TabButtons.Editor = createTabButton("Editor", 10)
-TabButtons.ScriptHub = createTabButton("Script Hub", 64)
-TabButtons.Settings = createTabButton("Settings", 118)
-
 for _, btn in pairs(TabButtons) do
     btn.MouseButton1Click:Connect(function()
         selectTab(btn.Name)
     end)
 end
 
-selectTab("Editor")
-populateScriptHub()
-
-CloseBtn.MouseButton1Click:Connect(function()
-    UI:Destroy()
-end)
-
 ExecuteBtn.MouseButton1Click:Connect(function()
-    local remote = ReplicatedStorage:WaitForChild("RemoteEvent")
-    local scriptText = Editor.Text
-    if scriptText ~= "" then
-        remote:FireServer(scriptText)
-    else
-        warn("No script to execute.")
+    local success, err = pcall(function()
+        loadstring(Editor.Text)()
+    end)
+    if not success then
+        warn("Execution error:", err)
     end
 end)
 
@@ -331,5 +333,24 @@ ClearBtn.MouseButton1Click:Connect(function()
 end)
 
 ToggleThemeBtn.MouseButton1Click:Connect(function()
-     
+    -- This is just a placeholder toggle, you can customize the theme toggling logic here
+    local bgColor = Main.BackgroundColor3
+    if bgColor == Color3.fromRGB(22, 22, 28) then
+        Main.BackgroundColor3 = Color3.fromRGB(250, 250, 250)
+        Editor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        Editor.TextColor3 = Color3.fromRGB(0, 0, 0)
+        TabPanel.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
+    else
+        Main.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+        Editor.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+        Editor.TextColor3 = Color3.fromRGB(235, 235, 235)
+        TabPanel.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+    end
 end)
+
+CloseBtn.MouseButton1Click:Connect(function()
+    UI:Destroy()
+end)
+
+populateScriptHub()
+selectTab("Editor")
