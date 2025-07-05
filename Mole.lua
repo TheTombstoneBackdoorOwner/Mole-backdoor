@@ -94,27 +94,27 @@ ButtonHolder.Parent = Main
 
 -- Buttons: Execute, Clear, Script Hub
 local function createButton(text, yOffset)
-	local Btn = Instance.new("TextButton")
-	Btn.Size = UDim2.new(1, 0, 0, 44)
-	Btn.Position = UDim2.new(0, 0, 0, yOffset)
-	Btn.BackgroundColor3 = Color3.fromRGB(60, 130, 230)
-	Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	Btn.TextSize = 16
-	Btn.Font = Enum.Font.GothamBold
-	Btn.Text = text
-	Btn.BorderSizePixel = 0
-	Btn.AutoButtonColor = false
-	Btn.Parent = ButtonHolder
-	Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 8)
+  local Btn = Instance.new("TextButton")
+  Btn.Size = UDim2.new(1, 0, 0, 44)
+  Btn.Position = UDim2.new(0, 0, 0, yOffset)
+  Btn.BackgroundColor3 = Color3.fromRGB(60, 130, 230)
+  Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+  Btn.TextSize = 16
+  Btn.Font = Enum.Font.GothamBold
+  Btn.Text = text
+  Btn.BorderSizePixel = 0
+  Btn.AutoButtonColor = false
+  Btn.Parent = ButtonHolder
+  Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 8)
 
-	Btn.MouseEnter:Connect(function()
-		TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(90, 160, 255)}):Play()
-	end)
-	Btn.MouseLeave:Connect(function()
-		TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(60, 130, 230)}):Play()
-	end)
+  Btn.MouseEnter:Connect(function()
+    TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(90, 160, 255)}):Play()
+  end)
+  Btn.MouseLeave:Connect(function()
+    TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(60, 130, 230)}):Play()
+  end)
 
-	return Btn
+  return Btn
 end
 
 local ExecuteBtn = createButton("EXECUTE", 0)
@@ -165,167 +165,176 @@ UIListLayout.Parent = ScriptList
 
 -- Scripts Table
 local scripts = {
-	["Troll"] = {
-		["Hint Message"] = [[
+  ["Troll"] = {
+   ["Hint Message"] = [[
 local hint = Instance.new("Hint", workspace)
 hint.Text = "THIS GAME JUST GOT FUCKED BY PEPSI (DISCORD: https://discord.gg/jzYpRg3vqX)"
 ]],
-		["Message Popup"] = [[
+   ["Message Popup"] = [[
 local message = Instance.new("Message", workspace)
 message.Text = "THIS GAME JUST GOT FUCKED BY PEPSI (DISCORD: https://discord.gg/jzYpRg3vqX)"
 wait(1)
 message:Destroy()
 ]]
-	},
+  },
 
-	["Utility"] = {
-		["Print Hello"] = [[print("Made by Wanna Die? (Put your own print here)")]]
-	},
+  ["Utility"] = {
+   ["Print Hello"] = [[print("Made by Wanna Die? (Put your own print here)")]]
+  },
 
-	["Exploit"] = {
-		["Polaria Loader"] = {
-			code = [[
+  ["Exploit"] = {
+   ["Polaria Loader"] = {
+    code = [[
 require(123255432303221):Pload("Yournamehere")
 ]],
-			dangerous = true
-		}
-	},
+    dangerous = true
+   }
+  },
 
-	["⚙ Settings"] = {
-		["Toggle Dark Theme"] = {
-			action = function()
-				local isDark = Main.BackgroundColor3 == Color3.fromRGB(22, 22, 28)
-				if isDark then
-					Main.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
-					TopBar.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-					Editor.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
-					Editor.TextColor3 = Color3.fromRGB(10, 10, 10)
-					ButtonHolder.BackgroundTransparency = 1
-				else
-					Main.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
-					TopBar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
-					Editor.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
-					Editor.TextColor3 = Color3.fromRGB(235, 235, 235)
-				end
-			end
-		},
-		["Made by Wanna Die?"] = [[-- Respect the creator]]
-	}
+  ["⚙ Settings"] = {
+   ["Toggle Dark Theme"] = {
+    action = function()
+     local isDark = Main.BackgroundColor3 == Color3.fromRGB(22, 22, 28)
+     if isDark then
+      Main.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+      TopBar.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+      Editor.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+      Editor.TextColor3 = Color3.fromRGB(10, 10, 10)
+      ButtonHolder.BackgroundTransparency = 1
+     else
+      Main.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+      TopBar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+      Editor.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+      Editor.TextColor3 = Color3.fromRGB(235, 235, 235)
+     end
+    end
+   },
+   ["Made by Wanna Die?"] = [[-- Respect the creator]]
+  }
 }
 
 -- Populate ScriptList
 for categoryName, categoryScripts in pairs(scripts) do
-	local categoryLabel = Instance.new("TextLabel")
-	categoryLabel.Size = UDim2.new(1, 0, 0, 25)
-	categoryLabel.BackgroundTransparency = 1
-	categoryLabel.Text = categoryName
-	categoryLabel.Font = Enum.Font.GothamBold
-	categoryLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
-	categoryLabel.TextSize = 16
-	categoryLabel.TextXAlignment = Enum.TextXAlignment.Left
-	categoryLabel.Parent = ScriptList
+  local categoryLabel = Instance.new("TextLabel")
+  categoryLabel.Size = UDim2.new(1, 0, 0, 25)
+  categoryLabel.BackgroundTransparency = 1
+  categoryLabel.Text = categoryName
+  categoryLabel.Font = Enum.Font.GothamBold
+  categoryLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+  categoryLabel.TextSize = 16
+  categoryLabel.TextXAlignment = Enum.TextXAlignment.Left
+  categoryLabel.Parent = ScriptList
 
-	for name, data in pairs(categoryScripts) do
-		local code = (typeof(data) == "table" and data.code) or (typeof(data) == "string" and data) or ""
-		local isDangerous = (typeof(data) == "table" and data.dangerous) or false
+  for name, data in pairs(categoryScripts) do
+   local code = (typeof(data) == "table" and data.code) or (typeof(data) == "string" and data) or ""
+   local isDangerous = (typeof(data) == "table" and data.dangerous) or false
 
-		local Btn = Instance.new("TextButton")
-		Btn.Size = UDim2.new(1, 0, 0, 40)
-		Btn.BackgroundColor3 = Color3.fromRGB(70, 70, 90)
-		Btn.TextColor3 = isDangerous and Color3.fromRGB(255, 120, 120) or Color3.fromRGB(255, 255, 255)
-		Btn.Font = Enum.Font.Gotham
-		Btn.TextSize = 14
-		Btn.Text = name
-		Btn.BorderSizePixel = 0
-		Btn.Parent = ScriptList
-		Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 6)
+   local Btn = Instance.new("TextButton")
+   Btn.Size = UDim2.new(1, 0, 0, 40)
+   Btn.BackgroundColor3 = Color3.fromRGB(70, 70, 90)
+   Btn.TextColor3 = isDangerous and Color3.fromRGB(255, 120, 120) or Color3.fromRGB(255, 255, 255)
+   Btn.Font = Enum.Font.Gotham
+   Btn.TextSize = 14
+   Btn.Text = name
+   Btn.BorderSizePixel = 0
+   Btn.Parent = ScriptList
+   Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 6)
 
-		Btn.MouseButton1Click:Connect(function()
-			if typeof(data) == "table" and data.action then
-				data.action()
-			else
-				if isDangerous then
-					print("⚠️ Polaria script loaded (risky).")
-				end
-				Editor.Text = code
-				HubFrame.Visible = false
-			end
-		end)
-	end
+   Btn.MouseButton1Click:Connect(function()
+    if typeof(data) == "table" and data.action then
+     data.action()
+    else
+     if isDangerous then
+      print("⚠️ Polaria script loaded (risky).")
+     end
+     Editor.Text = code
+     HubFrame.Visible = false
+    end
+   end)
+  end
 end
 
 -- === REMOTE EXECUTOR ===
 local servicesToScan = {
-	game:GetService("ReplicatedStorage"),
-	game:GetService("Workspace"),
-	game:GetService("Lighting")
+ game:GetService("ReplicatedStorage"),
+ game:GetService("Workspace"),
+ game:GetService("Lighting")
 }
 
 local function tryFireRemote(scriptText)
-	local sent = false
-	for _, service in ipairs(servicesToScan) do
-		for _, remote in ipairs(service:GetDescendants()) do
-			if remote:IsA("RemoteEvent") then
-				local success, err = pcall(function()
-					remote:FireServer(scriptText)
-				end)
-				if success then
-					print("[Backdoor] Fired remote:", remote:GetFullName())
-					sent = true
-				else
-					warn("[Backdoor] Failed to fire remote:", err)
-				end
-			end
-		end
-	end
-	return sent
+ local sent = false
+ for _, service in ipairs(servicesToScan) do
+  for _, remote in ipairs(service:GetDescendants()) do
+   if remote:IsA("RemoteEvent") then
+    local success, err = pcall(function()
+     remote:FireServer(scriptText)
+    end)
+    if success then sent = true end
+   elseif remote:IsA("RemoteFunction") then
+    local success, err = pcall(function()
+     remote:InvokeServer(scriptText)
+    end)
+    if success then sent = true end
+   end
+  end
+ end
+ return sent
 end
 
--- === LOCAL EXECUTOR ===
-local function tryLocalExecute(code)
-	if not loadstring then
-		warn("[Executor] Loadstring not supported.")
-		return
-	end
-	local f, err = loadstring(code)
-	if f then
-		local ok, execErr = pcall(f)
-		if not ok then warn("[Executor] Runtime error:", execErr)
-		else print("[Executor] Code executed locally.") end
-	else
-		warn("[Executor] Loadstring error:", err)
-	end
-end
-
--- === BUTTON EVENTS ===
+-- Button Actions
 ExecuteBtn.MouseButton1Click:Connect(function()
-	local code = Editor.Text
-	if code == "" then return end
-	local sent = tryFireRemote(code)
-	if not sent then tryLocalExecute(code) end
+ local scriptText = Editor.Text
+ local success, err = pcall(function()
+  loadstring(scriptText)()
+ end)
+ if not success then
+  local remoteSuccess = tryFireRemote(scriptText)
+  if not remoteSuccess then
+   warn("Script failed to run locally and remotely.")
+  end
+ end
 end)
 
 ClearBtn.MouseButton1Click:Connect(function()
-	Editor.Text = ""
+ Editor.Text = ""
 end)
 
 ScriptHubBtn.MouseButton1Click:Connect(function()
-	HubFrame.Visible = not HubFrame.Visible
+ HubFrame.Visible = not HubFrame.Visible
 end)
 
--- === FULL DRAGGABLE FUNCTION ===
+CloseBtn.MouseButton1Click:Connect(function()
+ UI:Destroy()
+end)
+
+MinBtn.MouseButton1Click:Connect(function()
+ if Main.Size.Y.Offset == 40 then
+  Main.Size = UDim2.new(0, 480, 0, 340)
+  Editor.Visible = true
+  ButtonHolder.Visible = true
+ else
+  Main.Size = UDim2.new(0, 480, 0, 40)
+  Editor.Visible = false
+  ButtonHolder.Visible = false
+  HubFrame.Visible = false
+ end
+end)
+
+-- Improved Fully Draggable Function (draggable anywhere on all descendants)
 local function makeFullyDraggable(frame)
     frame.Active = true
+    frame.Selectable = true
 
     local dragging = false
-    local dragStart
-    local startPos
+    local dragStartPos = nil
+    local frameStartPos = nil
 
     local function onInputBegan(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
-            dragStart = input.Position
-            startPos = frame.Position
+            dragStartPos = input.Position
+            frameStartPos = frame.Position
+
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
@@ -336,54 +345,36 @@ local function makeFullyDraggable(frame)
 
     local function onInputChanged(input)
         if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStart
+            local delta = input.Position - dragStartPos
             frame.Position = UDim2.new(
-                startPos.X.Scale,
-                startPos.X.Offset + delta.X,
-                startPos.Y.Scale,
-                startPos.Y.Offset + delta.Y
+                frameStartPos.X.Scale,
+                frameStartPos.X.Offset + delta.X,
+                frameStartPos.Y.Scale,
+                frameStartPos.Y.Offset + delta.Y
             )
         end
     end
 
-    -- Connect for frame itself
-    frame.InputBegan:Connect(onInputBegan)
-    frame.InputChanged:Connect(onInputChanged)
+    local function connectGuiObject(guiObj)
+        guiObj.InputBegan:Connect(onInputBegan)
+        guiObj.InputChanged:Connect(onInputChanged)
+    end
 
-    -- Connect for all existing descendants (to drag when clicking anywhere)
+    connectGuiObject(frame)
+
     for _, child in ipairs(frame:GetDescendants()) do
         if child:IsA("GuiObject") then
-            child.InputBegan:Connect(onInputBegan)
-            child.InputChanged:Connect(onInputChanged)
+            connectGuiObject(child)
         end
     end
 
-    -- Connect for any descendants added later
     frame.DescendantAdded:Connect(function(child)
         if child:IsA("GuiObject") then
-            child.InputBegan:Connect(onInputBegan)
-            child.InputChanged:Connect(onInputChanged)
+            connectGuiObject(child)
         end
     end)
 end
 
--- Apply draggable to Main and HubFrame
+-- Apply draggable to both Main and HubFrame
 makeFullyDraggable(Main)
 makeFullyDraggable(HubFrame)
-
--- === BUTTONS MINIMIZE AND CLOSE ===
-MinBtn.MouseButton1Click:Connect(function()
-	if Main.Size.Y.Offset > 40 then
-		TweenService:Create(Main, TweenInfo.new(0.2), {Size = UDim2.new(Main.Size.X.Scale, Main.Size.X.Offset, 0, 40)}):Play()
-		Editor.Visible = false
-		ButtonHolder.Visible = false
-	else
-		TweenService:Create(Main, TweenInfo.new(0.2), {Size = UDim2.new(Main.Size.X.Scale, Main.Size.X.Offset, 0, 340)}):Play()
-		Editor.Visible = true
-		ButtonHolder.Visible = true
-	end
-end)
-
-CloseBtn.MouseButton1Click:Connect(function()
-	UI:Destroy()
-end)
