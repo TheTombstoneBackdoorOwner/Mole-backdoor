@@ -24,7 +24,7 @@ Main.BorderSizePixel = 0
 Main.AnchorPoint = Vector2.new(0.5, 0.5)
 Main.Parent = UI
 Main.Active = true
-Main.Draggable = false
+Main.Draggable = true
 Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
 
 local TopBar = Instance.new("Frame")
@@ -33,7 +33,7 @@ TopBar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
 TopBar.BorderSizePixel = 0
 TopBar.Parent = Main
 TopBar.Active = true
-TopBar.Draggable = true
+TopBar.Draggable = false
 Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 12)
 
 local Title = Instance.new("TextLabel")
@@ -331,19 +331,18 @@ for _, btn in pairs(TabButtons) do
 end
 
 ExecuteBtn.MouseButton1Click:Connect(function()
-    local scriptCode = Editor.Text
-    if scriptCode ~= "" then
-        local func, err = loadstring(scriptCode)
-        if func then
-            local success, runtimeError = pcall(func)
-            if not success then
-                warn("Runtime error: " .. tostring(runtimeError))
-            end
-        else
-            warn("Compile error: " .. tostring(err))
-        end
+    StatusText.Text = "Executing..."
+    local remote = game:GetService("ReplicatedStorage"):FindFirstChild("RemoteEvent")
+    if remote then
+        remote:FireServer(Editor.Text)
+        StatusText.Text = "Script sent to server!"
+    else
+        StatusText.Text = "Error: RemoteEvent not found"
     end
+    wait(2)
+    StatusText.Text = "Ready"
 end)
+
 
 ClearBtn.MouseButton1Click:Connect(function()
     Editor.Text = ""
