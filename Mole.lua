@@ -3,10 +3,11 @@ local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-local message = Instance.new("Message", workspace)
-message.Text = "Thanks for using Fuse SS (This is the 281st time ive done this😭🙏)"
-wait(1) -- Change the number for how long is should stay for.
-message:Destroy() -- Remove the wait and destroy for it always stay.
+-- Use Hint instead of Message (Message deprecated)
+local hint = Instance.new("Hint", workspace)
+hint.Text = "Thanks for using Fuse SS (This is the 281st time ive done this😭🙏)"
+wait(1) -- Adjust how long it stays
+hint:Destroy()
 
 -- UI Setup
 local UI = Instance.new("ScreenGui")
@@ -196,19 +197,47 @@ UIListLayout.Padding = UDim.new(0, 6)
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UIListLayout.Parent = ScriptList
 
--- Your existing scripts table here (omitted for brevity) --
+-- Define switchToTab BEFORE usage
+local currentTab = "Editor"
+local tweenTime = 0.3
+
+local function switchToTab(tabName)
+ if tabName == currentTab then return end
+
+ if tabName == "Editor" then
+  TweenService:Create(EditorContent, TweenInfo.new(tweenTime), {Position = UDim2.new(0, 0, 0, 0)}):Play()
+  TweenService:Create(ScriptHubContent, TweenInfo.new(tweenTime), {Position = UDim2.new(0, 0, 1, 0)}):Play()
+
+  EditorTabBtn.BackgroundColor3 = Color3.fromRGB(60, 130, 230)
+  EditorTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+  ScriptHubTabBtn.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+  ScriptHubTabBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+
+ elseif tabName == "Script Hub" then
+  TweenService:Create(EditorContent, TweenInfo.new(tweenTime), {Position = UDim2.new(0, 0, -1, 0)}):Play()
+  TweenService:Create(ScriptHubContent, TweenInfo.new(tweenTime), {Position = UDim2.new(0, 0, 0, 0)}):Play()
+
+  ScriptHubTabBtn.BackgroundColor3 = Color3.fromRGB(60, 130, 230)
+  ScriptHubTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+  EditorTabBtn.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+  EditorTabBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+ end
+
+ currentTab = tabName
+end
+
+-- Your existing scripts table here (ensure you fill this)
 local scripts = {
-  -- same as your previous scripts table
   ["Troll"] = {
    ["Hint Message"] = [[
 local hint = Instance.new("Hint", workspace)
 hint.Text = "THIS GAME JUST GOT FUCKED BY PEPSI (DISCORD: https://discord.gg/jzYpRg3vqX)"
 ]],
    ["Message Popup"] = [[
-local message = Instance.new("Message", workspace)
-message.Text = "THIS GAME JUST GOT FUCKED BY PEPSI (DISCORD: https://discord.gg/jzYpRg3vqX)"
+local hint = Instance.new("Hint", workspace)
+hint.Text = "THIS GAME JUST GOT FUCKED BY PEPSI (DISCORD: https://discord.gg/jzYpRg3vqX)"
 wait(1)
-message:Destroy()
+hint:Destroy()
 ]]
   },
   ["Utility"] = {
@@ -257,140 +286,3 @@ for categoryName, categoryScripts in pairs(scripts) do
   categoryLabel.Parent = ScriptList
 
   for name, data in pairs(categoryScripts) do
-   local code = (typeof(data) == "table" and data.code) or (typeof(data) == "string" and data) or ""
-   local isDangerous = (typeof(data) == "table" and data.dangerous) or false
-
-   local Btn = Instance.new("TextButton")
-   Btn.Size = UDim2.new(1, 0, 0, 40)
-   Btn.BackgroundColor3 = Color3.fromRGB(70, 70, 90)
-   Btn.TextColor3 = isDangerous and Color3.fromRGB(255, 120, 120) or Color3.fromRGB(255, 255, 255)
-   Btn.Font = Enum.Font.Gotham
-   Btn.TextSize = 14
-   Btn.Text = name
-   Btn.BorderSizePixel = 0
-   Btn.Parent = ScriptList
-   Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 6)
-
-   Btn.MouseButton1Click:Connect(function()
-    if typeof(data) == "table" and data.action then
-     data.action()
-    else
-     if isDangerous then
-      print("⚠️ Polaria script loaded (risky).")
-     end
-     Editor.Text = code
-     switchToTab("Editor") -- auto switch to editor tab on selecting script
-    end
-   end)
-  end
-end
-
--- Helper to tween tab switch
-local currentTab = "Editor"
-local tweenTime = 0.3
-
-local function switchToTab(tabName)
- if tabName == currentTab then return end
-
- if tabName == "Editor" then
-  -- Editor slides from below to visible, ScriptHub slides down out
-  TweenService:Create(EditorContent, TweenInfo.new(tweenTime), {Position = UDim2.new(0, 0, 0, 0)}):Play()
-  TweenService:Create(ScriptHubContent, TweenInfo.new(tweenTime), {Position = UDim2.new(0, 0, 1, 0)}):Play()
-
-  EditorTabBtn.BackgroundColor3 = Color3.fromRGB(60, 130, 230)
-  EditorTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-  ScriptHubTabBtn.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
-  ScriptHubTabBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
-
- elseif tabName == "Script Hub" then
-  -- ScriptHub slides up visible, Editor slides up out
-  TweenService:Create(EditorContent, TweenInfo.new(tweenTime), {Position = UDim2.new(0, 0, -1, 0)}):Play()
-  TweenService:Create(ScriptHubContent, TweenInfo.new(tweenTime), {Position = UDim2.new(0, 0, 0, 0)}):Play()
-
-  ScriptHubTabBtn.BackgroundColor3 = Color3.fromRGB(60, 130, 230)
-  ScriptHubTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-  EditorTabBtn.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
-  EditorTabBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
- end
-
- currentTab = tabName
-end
-
--- Initialize tab colors
-switchToTab("Editor")
-
-EditorTabBtn.MouseButton1Click:Connect(function()
- switchToTab("Editor")
-end)
-
-ScriptHubTabBtn.MouseButton1Click:Connect(function()
- switchToTab("Script Hub")
-end)
-
--- Buttons functionality
-ExecuteBtn.MouseButton1Click:Connect(function()
- local success, err = pcall(function()
-  loadstring(Editor.Text)()
- end)
- if not success then
-  warn("Error executing script:", err)
- end
-end)
-
-ClearBtn.MouseButton1Click:Connect(function()
- Editor.Text = ""
-end)
-
--- Minimize & Close buttons
-local minimized = false
-MinBtn.MouseButton1Click:Connect(function()
- if minimized then
-  Main.Size = UDim2.new(0, 480, 0, 380)
-  ContentHolder.Visible = true
- else
-  Main.Size = UDim2.new(0, 480, 0, 40)
-  ContentHolder.Visible = false
- end
- minimized = not minimized
-end)
-
-CloseBtn.MouseButton1Click:Connect(function()
- UI:Destroy()
-end)
-
--- Dragging functionality on Main frame (drag whole UI)
-local UserInputService = game:GetService("UserInputService")
-
-local dragging, dragInput, dragStart, startPos
-
-local function update(input)
- local delta = input.Position - dragStart
- Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
-                         startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-end
-
-Main.InputBegan:Connect(function(input)
- if input.UserInputType == Enum.UserInputType.MouseButton1 then
-  dragging = true
-  dragStart = input.Position
-  startPos = Main.Position
-
-  input.Changed:Connect(function()
-   if input.UserInputState == Enum.UserInputState.End then
-    dragging = false
-   end
-  end)
- end
-end)
-
-Main.InputChanged:Connect(function(input)
- if input.UserInputType == Enum.UserInputType.MouseMovement then
-  dragInput = input
- end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
- if input == dragInput and dragging then
-  update(input)
- end
-end)
