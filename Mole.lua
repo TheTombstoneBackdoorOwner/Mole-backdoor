@@ -6,7 +6,7 @@ local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
 local message = Instance.new("Message", workspace)
-message.Text = "Thanks for using Mole ss (DISCORD: https://discord.gg/jzYpRg3vqX)"
+message.Text = "Thanks for using Fuse SS (DISCORD: https://discord.gg/jzYpRg3vqX)"
 wait(1) -- Change the number for how long is should stay for.
 message:Destroy() -- Remove the wait and destroy for it always stay.
 
@@ -36,7 +36,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, -130, 1, 0)
 Title.Position = UDim2.new(0, 10, 0, 0)
 Title.BackgroundTransparency = 1
-Title.Text = "Mole Backdoor"
+Title.Text = "Fuse Backdoor"
 Title.Font = Enum.Font.GothamSemibold
 Title.TextColor3 = Color3.fromRGB(240, 240, 240)
 Title.TextSize = 18
@@ -129,6 +129,7 @@ HubFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
 HubFrame.BorderSizePixel = 0
 HubFrame.Visible = false
 HubFrame.Parent = UI
+HubFrame.Draggable = true
 Instance.new("UICorner", HubFrame).CornerRadius = UDim.new(0, 10)
 
 local HubTopBar = Instance.new("Frame")
@@ -136,6 +137,7 @@ HubTopBar.Size = UDim2.new(1, 0, 0, 30)
 HubTopBar.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
 HubTopBar.BorderSizePixel = 0
 HubTopBar.Parent = HubFrame
+HubTopBar.Draggable = true
 Instance.new("UICorner", HubTopBar).CornerRadius = UDim.new(0, 10)
 
 local HubTitle = Instance.new("TextLabel")
