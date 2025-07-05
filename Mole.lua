@@ -282,37 +282,37 @@ TabButtons.Settings = (function()
     return btn
 end)()
 
-local function selectTab(tabName)
-    TabButtons.Editor.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
-    TabButtons.ScriptHub.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
-    TabButtons.Settings.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+local currentRemoteEvent = nil
+local currentRemoteFunction = nil
 
-    TabButtons[tabName].BackgroundColor3 = Color3.fromRGB(70, 70, 90)
+local function updateRemotes()
+    currentRemoteEvent = ReplicatedStorage:FindFirstChild("RemoteEvent")
+    if currentRemoteEvent and not currentRemoteEvent:IsA("RemoteEvent") then
+        currentRemoteEvent = nil
+    end
 
-    EditorFrame.Visible = (tabName == "Editor")
-    ScriptHubFrame.Visible = (tabName == "ScriptHub")
-    SettingsFrame.Visible = (tabName == "Settings")
+    currentRemoteFunction = ReplicatedStorage:FindFirstChild("RemoteExecutor")
+    if currentRemoteFunction and not currentRemoteFunction:IsA("RemoteFunction") then
+        currentRemoteFunction = nil
+    end
 end
 
-selectTab("Editor")
-populateScriptHub()
+-- Initial update
+updateRemotes()
 
-CloseBtn.MouseButton1Click:Connect(function()
-    UI:Destroy()
+ReplicatedStorage.ChildAdded:Connect(function(child)
+    if child.Name == "RemoteEvent" and child:IsA("RemoteEvent") then
+        currentRemoteEvent = child
+    elseif child.Name == "RemoteExecutor" and child:IsA("RemoteFunction") then
+        currentRemoteFunction = child
+    end
 end)
 
-ClearBtn.MouseButton1Click:Connect(function()
-    Editor.Text = ""
-end)
-
-local useFunction = false
-ToggleMethodBtn.Text = "Use RemoteEvent"
-ToggleMethodBtn.MouseButton1Click:Connect(function()
-    useFunction = not useFunction
-    if useFunction then
-        ToggleMethodBtn.Text = "Use RemoteFunction"
-    else
-        ToggleMethodBtn.Text = "Use RemoteEvent"
+ReplicatedStorage.ChildRemoved:Connect(function(child)
+    if child == currentRemoteEvent then
+        currentRemoteEvent = nil
+    elseif child == currentRemoteFunction then
+        currentRemoteFunction = nil
     end
 end)
 
@@ -329,33 +329,27 @@ ExecuteBtn.MouseButton1Click:Connect(function()
     local scriptText = Editor.Text
     local success = false
 
-    if not useFunction then
-        local evt = ReplicatedStorage:FindFirstChild("RemoteEvent")
-        if evt and evt:IsA("RemoteEvent") then
-            local ok, err = pcall(function()
-                evt:FireServer(scriptText)
-            end)
-            if ok then
-                StatusText.Text = "Sent via RemoteEvent!"
-                success = true
-            else
-                StatusText.Text = "RemoteEvent error: "..tostring(err)
-            end
+    if currentRemoteEvent then
+        local ok, err = pcall(function()
+            currentRemoteEvent:FireServer(scriptText)
+        end)
+        if ok then
+            StatusText.Text = "Sent via RemoteEvent!"
+            success = true
+        else
+            StatusText.Text = "RemoteEvent error: "..tostring(err)
         end
     end
 
-    if not success then
-        local fn = ReplicatedStorage:FindFirstChild("RemoteExecutor")
-        if fn and fn:IsA("RemoteFunction") then
-            local ok, result = pcall(function()
-                return fn:InvokeServer(scriptText)
-            end)
-            if ok then
-                StatusText.Text = tostring(result or "Executed via RemoteFunction")
-                success = true
-            else
-                StatusText.Text = "RemoteFunction error: "..tostring(result)
-            end
+    if currentRemoteFunction then
+        local ok, result = pcall(function()
+            return currentRemoteFunction:InvokeServer(scriptText)
+        end)
+        if ok then
+            StatusText.Text = tostring(result or "Executed via RemoteFunction")
+            success = true
+        else
+            StatusText.Text = "RemoteFunction error: "..tostring(result)
         end
     end
 
@@ -366,3 +360,37 @@ ExecuteBtn.MouseButton1Click:Connect(function()
     wait(2)
     StatusText:Destroy()
 end)
+
+ClearBtn.MouseButton1Click:Connect(function()
+    Editor.Text = ""
+end)
+
+local function selectTab(name)
+    EditorFrame.Visible = (name == "Editor")
+    ScriptHubFrame.Visible = (name == "ScriptHub")
+    SettingsFrame.Visible = (name == "Settings")
+end
+
+TabButtons.Editor.MouseButton1Click:Connect(function()
+    selectTab("Editor")
+end)
+
+TabButtons.ScriptHub.MouseButton1Click:Connect(function()
+    populateScriptHub()
+    selectTab("ScriptHub")
+end)
+
+TabButtons.Settings.MouseButton1Click:Connect(function()
+    selectTab("Settings")
+end)
+
+ToggleMethodBtn.MouseButton1Click:Connect(function()
+    -- Implement method toggle logic if you want
+    print("METHOD toggle clicked (you can add logic here)")
+end)
+
+CloseBtn.MouseButton1Click:Connect(function()
+    UI:Destroy()
+end)
+
+selectTab("Editor")
