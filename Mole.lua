@@ -69,31 +69,6 @@ TabPanel.Active = true
 TabPanel.Draggable = false
 Instance.new("UICorner", TabPanel).CornerRadius = UDim.new(0, 12)
 
-local TabButtons = {}
-
-local function createTabButton(name, yPos)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -20, 0, 44)
-    btn.Position = UDim2.new(0, 10, 0, yPos)
-    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 16
-    btn.Text = name
-    btn.BorderSizePixel = 0
-    btn.Parent = TabPanel
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
-    btn.MouseEnter:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(70, 70, 90)}):Play()
-    end)
-    btn.MouseLeave:Connect(function()
-        if btn ~= selectedTabButton then
-            TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}):Play()
-        end
-    end)
-    return btn
-end
-
 local EditorFrame = Instance.new("Frame")
 EditorFrame.Size = UDim2.new(1, -120, 1, -65)
 EditorFrame.Position = UDim2.new(0, 120, 0, 40)
@@ -111,8 +86,6 @@ ScriptHubFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
 ScriptHubFrame.BorderSizePixel = 0
 ScriptHubFrame.Parent = Main
 ScriptHubFrame.Visible = false
-ScriptHubFrame.Active = true
-ScriptHubFrame.Draggable = false
 Instance.new("UICorner", ScriptHubFrame).CornerRadius = UDim.new(0, 12)
 
 local SettingsFrame = Instance.new("Frame")
@@ -122,8 +95,6 @@ SettingsFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
 SettingsFrame.BorderSizePixel = 0
 SettingsFrame.Parent = Main
 SettingsFrame.Visible = false
-SettingsFrame.Active = true
-SettingsFrame.Draggable = false
 Instance.new("UICorner", SettingsFrame).CornerRadius = UDim.new(0, 12)
 
 local Editor = Instance.new("TextBox")
@@ -149,8 +120,6 @@ EditorButtons.Size = UDim2.new(1, -40, 0, 50)
 EditorButtons.Position = UDim2.new(0, 20, 1, -60)
 EditorButtons.BackgroundTransparency = 1
 EditorButtons.Parent = EditorFrame
-EditorButtons.Active = true
-EditorButtons.Draggable = false
 
 local function createEditorButton(text, positionX)
     local btn = Instance.new("TextButton")
@@ -176,7 +145,7 @@ end
 
 local ExecuteBtn = createEditorButton("EXECUTE", 0)
 local ClearBtn = createEditorButton("CLEAR", 120)
-local ToggleThemeBtn = createEditorButton("TOGGLE THEME", 240)
+local ToggleMethodBtn = createEditorButton("METHOD", 240)
 
 local ScriptList = Instance.new("ScrollingFrame")
 ScriptList.Size = UDim2.new(1, -40, 1, -40)
@@ -195,39 +164,28 @@ UIListLayout.Parent = ScriptList
 
 local scripts = {
     ["Troll"] = {
-        ["Hint Message"] = [[
-local hint = Instance.new("Hint", workspace)
-hint.Text = "THIS GAME JUST GOT FUCKED BY PEPSI (DISCORD: https://discord.gg/jzYpRg3vqX)"
-]],
-        ["Message Popup"] = [[
-local message = Instance.new("Message", workspace)
-message.Text = "THIS GAME JUST GOT FUCKED BY PEPSI (DISCORD: https://discord.gg/jzYpRg3vqX)"
-wait(1)
-message:Destroy()
-]]
+        ["Hint Message"] = "local hint = Instance.new(\"Hint\", workspace)\nhint.Text = \"THIS GAME JUST GOT FUCKED BY PEPSI\"",
+        ["Message Popup"] = "local message = Instance.new(\"Message\", workspace)\nmessage.Text = \"THIS GAME JUST GOT FUCKED BY PEPSI\"\nwait(1)\nmessage:Destroy()"
     },
     ["Utility"] = {
-        ["Print Hello"] = [[print("Made by Wanna Die? (Put your own print here)")]]
+        ["Print Hello"] = "print(\"Hello from Smoke Backdoor\")"
     },
     ["Exploit"] = {
-        ["Polaria Loader"] = {
-            code = [[
-require(123255432303221):Pload("Yournamehere")
-]],
-            dangerous = true
-        }
+        ["Polaria Loader"] = { code = "require(123255432303221):Pload(\"Yournamehere\")", dangerous = true }
     }
 }
 
+local TabButtons = {}
+
 local function clearScriptList()
-    for _, child in pairs(ScriptList:GetChildren()) do
-        if child:IsA("TextButton") then
-            child:Destroy()
+    for _, v in ipairs(ScriptList:GetChildren()) do
+        if v:IsA("TextButton") then
+            v:Destroy()
         end
     end
 end
 
-local function createScriptButton(name, scriptData)
+local function createScriptButton(name, data)
     local Btn = Instance.new("TextButton")
     Btn.Size = UDim2.new(1, 0, 0, 40)
     Btn.BackgroundColor3 = Color3.fromRGB(60, 130, 230)
@@ -245,10 +203,10 @@ local function createScriptButton(name, scriptData)
         TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(60, 130, 230)}):Play()
     end)
     Btn.MouseButton1Click:Connect(function()
-        if type(scriptData) == "table" and scriptData.code then
-            Editor.Text = scriptData.code
-        elseif type(scriptData) == "string" then
-            Editor.Text = scriptData
+        if type(data)=="table" and data.code then
+            Editor.Text = data.code
+        elseif type(data)=="string" then
+            Editor.Text = data
         end
         selectTab("Editor")
     end)
@@ -256,14 +214,14 @@ end
 
 local function populateScriptHub()
     clearScriptList()
-    for category, scriptsInCategory in pairs(scripts) do
+    for cat, group in pairs(scripts) do
         local CatBtn = Instance.new("TextButton")
         CatBtn.Size = UDim2.new(1, 0, 0, 30)
         CatBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
         CatBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
         CatBtn.Font = Enum.Font.GothamBold
         CatBtn.TextSize = 14
-        CatBtn.Text = category
+        CatBtn.Text = cat
         CatBtn.BorderSizePixel = 0
         CatBtn.Parent = ScriptList
         Instance.new("UICorner", CatBtn).CornerRadius = UDim.new(0, 6)
@@ -273,55 +231,88 @@ local function populateScriptHub()
         CatBtn.MouseLeave:Connect(function()
             TweenService:Create(CatBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}):Play()
         end)
-
-        for scriptName, scriptContent in pairs(scriptsInCategory) do
-            createScriptButton(scriptName, scriptContent)
+        for name, info in pairs(group) do
+            createScriptButton(name, info)
         end
     end
 end
 
-TabButtons.Editor = createTabButton("Editor", 10)
-TabButtons.Editor.Name = "Editor"
+TabButtons.Editor = (function()
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -20, 0, 44)
+    btn.Position = UDim2.new(0, 10, 0, 10)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 16
+    btn.Text = "Editor"
+    btn.BorderSizePixel = 0
+    btn.Parent = TabPanel
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+    return btn
+end)()
 
-TabButtons.ScriptHub = createTabButton("Script Hub(Soon)", 64)
-TabButtons.ScriptHub.Name = "Script Hub(Soon)"
+TabButtons.ScriptHub = (function()
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -20, 0, 44)
+    btn.Position = UDim2.new(0, 10, 0, 64)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 16
+    btn.Text = "Script Hub"
+    btn.Name = "Script Hub"
+    btn.BorderSizePixel = 0
+    btn.Parent = TabPanel
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+    return btn
+end)()
 
-TabButtons.Settings = createTabButton("Settings(Soon)", 118)
-TabButtons.Settings.Name = "Settings"
+TabButtons.Settings = (function()
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -20, 0, 44)
+    btn.Position = UDim2.new(0, 10, 0, 118)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 16
+    btn.Text = "Settings"
+    btn.BorderSizePixel = 0
+    btn.Parent = TabPanel
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+    return btn
+end)()
 
-local selectedTabButton = nil
+local selectedTabBtn
 
-local function selectTab(tabName)
-    if selectedTabButton then
-        TweenService:Create(selectedTabButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}):Play()
+function selectTab(name)
+    if selectedTabBtn then
+        TweenService:Create(selectedTabBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}):Play()
     end
-
-    selectedTabButton = nil
-
+    selectedTabBtn = nil
     for _, btn in pairs(TabButtons) do
-        if btn.Name == tabName then
-            selectedTabButton = btn
+        if btn.Text == name then
+            selectedTabBtn = btn
             TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(60, 130, 230)}):Play()
         else
             TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}):Play()
         end
     end
-
-    EditorFrame.Visible = false
-    ScriptHubFrame.Visible = false
-    SettingsFrame.Visible = false
-
-    if tabName == "Editor" then
-        EditorFrame.Visible = true
-    elseif tabName == "Script Hub" then
-        ScriptHubFrame.Visible = true
-    elseif tabName == "Settings" then
-        SettingsFrame.Visible = true
-    end
+    EditorFrame.Visible = name == "Editor"
+    ScriptHubFrame.Visible = name == "Script Hub"
+    SettingsFrame.Visible = name == "Settings"
 end
 
 selectTab("Editor")
 populateScriptHub()
+
+local useFunction = false
+
+ToggleMethodBtn.Text = "USE EVT"
+ToggleMethodBtn.MouseButton1Click:Connect(function()
+    useFunction = not useFunction
+    ToggleMethodBtn.Text = useFunction and "USE FUNC" or "USE EVT"
+end)
 
 CloseBtn.MouseButton1Click:Connect(function()
     UI:Destroy()
@@ -340,15 +331,36 @@ ExecuteBtn.MouseButton1Click:Connect(function()
     StatusText.TextColor3 = Color3.fromRGB(255, 255, 255)
     StatusText.Text = "Executing..."
     StatusText.Parent = EditorFrame
-
-    local remote = ReplicatedStorage:FindFirstChild("RemoteEvent")
-    if remote then
-        remote:FireServer(Editor.Text)
-        StatusText.Text = "Script sent to server!"
-    else
-        StatusText.Text = "Error: RemoteEvent not found"
+    local scriptText = Editor.Text
+    local success = false
+    if not useFunction then
+        local evt = ReplicatedStorage:FindFirstChild("RemoteEvent")
+        if evt then
+            pcall(function()
+                evt:FireServer(scriptText)
+                success = true
+                StatusText.Text = "Sent via RemoteEvent!"
+            end)
+        end
     end
-
+    if not success then
+        local fn = ReplicatedStorage:FindFirstChild("RemoteExecutor")
+        if fn then
+            local result
+            local ok, err = pcall(function()
+                result = fn:InvokeServer(scriptText)
+            end)
+            if ok then
+                StatusText.Text = tostring(result or "Executed via RemoteFunction")
+                success = true
+            else
+                StatusText.Text = "RemoteFunction error: "..tostring(err)
+            end
+        end
+    end
+    if not success then
+        StatusText.Text = "No valid remote found"
+    end
     wait(2)
     StatusText:Destroy()
 end)
