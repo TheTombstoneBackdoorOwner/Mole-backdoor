@@ -290,9 +290,10 @@ TabButtons.ScriptHub.Name = "Script Hub"
 TabButtons.Settings = createTabButton("Settings", 118)
 TabButtons.Settings.Name = "Settings"
 
-local selectedTabButton
+local selectedTabButton = nil
 
 local function selectTab(tabName)
+    -- Reset previous tab button color
     if selectedTabButton then
         TweenService:Create(selectedTabButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}):Play()
     end
@@ -308,9 +309,19 @@ local function selectTab(tabName)
         end
     end
 
-    EditorFrame.Visible = (tabName == "Editor")
-    ScriptHubFrame.Visible = (tabName == "Script Hub")
-    SettingsFrame.Visible = (tabName == "Settings")
+    -- Hide all frames first
+    EditorFrame.Visible = false
+    ScriptHubFrame.Visible = false
+    SettingsFrame.Visible = false
+
+    -- Show only the selected frame
+    if tabName == "Editor" then
+        EditorFrame.Visible = true
+    elseif tabName == "Script Hub" then
+        ScriptHubFrame.Visible = true
+    elseif tabName == "Settings" then
+        SettingsFrame.Visible = true
+    end
 end
 
 for _, btn in pairs(TabButtons) do
@@ -320,11 +331,17 @@ for _, btn in pairs(TabButtons) do
 end
 
 ExecuteBtn.MouseButton1Click:Connect(function()
-    local success, err = pcall(function()
-        loadstring(Editor.Text)()
-    end)
-    if not success then
-        warn("Execution error:", err)
+    local scriptCode = Editor.Text
+    if scriptCode ~= "" then
+        local func, err = loadstring(scriptCode)
+        if func then
+            local success, runtimeError = pcall(func)
+            if not success then
+                warn("Runtime error: " .. tostring(runtimeError))
+            end
+        else
+            warn("Compile error: " .. tostring(err))
+        end
     end
 end)
 
@@ -333,19 +350,8 @@ ClearBtn.MouseButton1Click:Connect(function()
 end)
 
 ToggleThemeBtn.MouseButton1Click:Connect(function()
-    -- This is just a placeholder toggle, you can customize the theme toggling logic here
-    local bgColor = Main.BackgroundColor3
-    if bgColor == Color3.fromRGB(22, 22, 28) then
-        Main.BackgroundColor3 = Color3.fromRGB(250, 250, 250)
-        Editor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        Editor.TextColor3 = Color3.fromRGB(0, 0, 0)
-        TabPanel.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
-    else
-        Main.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
-        Editor.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
-        Editor.TextColor3 = Color3.fromRGB(235, 235, 235)
-        TabPanel.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
-    end
+    -- You can implement theme toggle here if you want
+    print("Toggle theme button clicked")
 end)
 
 CloseBtn.MouseButton1Click:Connect(function()
