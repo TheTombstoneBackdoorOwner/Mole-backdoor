@@ -4,10 +4,10 @@ local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
 -- Use Hint instead of Message (Message deprecated)
-local hint = Instance.new("Hint", workspace)
-hint.Text = "Thanks for using Fuse SS (This is the 281st time ive done this😭🙏)"
+local message = Instance.new("Message", workspace)
+message.Text = "Thanks for using Fuse SS (This is the 281st time ive done this😭🙏)"
 wait(1) -- Adjust how long it stays
-hint:Destroy()
+message:Destroy()
 
 -- UI Setup
 local UI = Instance.new("ScreenGui")
