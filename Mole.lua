@@ -280,7 +280,6 @@ local function populateScriptHub()
     end
 end
 
--- Tab buttons creation
 TabButtons.Editor = createTabButton("Editor", 10)
 TabButtons.Editor.Name = "Editor"
 
@@ -293,7 +292,6 @@ TabButtons.Settings.Name = "Settings"
 local selectedTabButton = nil
 
 local function selectTab(tabName)
-    -- Reset previous tab button color
     if selectedTabButton then
         TweenService:Create(selectedTabButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}):Play()
     end
@@ -309,12 +307,10 @@ local function selectTab(tabName)
         end
     end
 
-    -- Hide all frames first
     EditorFrame.Visible = false
     ScriptHubFrame.Visible = false
     SettingsFrame.Visible = false
 
-    -- Show only the selected frame
     if tabName == "Editor" then
         EditorFrame.Visible = true
     elseif tabName == "Script Hub" then
@@ -324,38 +320,35 @@ local function selectTab(tabName)
     end
 end
 
-for _, btn in pairs(TabButtons) do
-    btn.MouseButton1Click:Connect(function()
-        selectTab(btn.Name)
-    end)
-end
+selectTab("Editor")
+populateScriptHub()
+
+CloseBtn.MouseButton1Click:Connect(function()
+    UI:Destroy()
+end)
+
+ClearBtn.MouseButton1Click:Connect(function()
+    Editor.Text = ""
+end)
 
 ExecuteBtn.MouseButton1Click:Connect(function()
+    local StatusText = Instance.new("TextLabel")
+    StatusText.Size = UDim2.new(1, 0, 0, 30)
+    StatusText.Position = UDim2.new(0, 0, 1, -30)
+    StatusText.BackgroundTransparency = 0.5
+    StatusText.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    StatusText.TextColor3 = Color3.fromRGB(255, 255, 255)
     StatusText.Text = "Executing..."
-    local remote = game:GetService("ReplicatedStorage"):FindFirstChild("RemoteEvent")
+    StatusText.Parent = EditorFrame
+
+    local remote = ReplicatedStorage:FindFirstChild("RemoteEvent")
     if remote then
         remote:FireServer(Editor.Text)
         StatusText.Text = "Script sent to server!"
     else
         StatusText.Text = "Error: RemoteEvent not found"
     end
+
     wait(2)
-    StatusText.Text = "Ready"
+    StatusText:Destroy()
 end)
-
-
-ClearBtn.MouseButton1Click:Connect(function()
-    Editor.Text = ""
-end)
-
-ToggleThemeBtn.MouseButton1Click:Connect(function()
-    -- You can implement theme toggle here if you want
-    print("Toggle theme button clicked")
-end)
-
-CloseBtn.MouseButton1Click:Connect(function()
-    UI:Destroy()
-end)
-
-populateScriptHub()
-selectTab("Editor")
