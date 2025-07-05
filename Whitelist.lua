@@ -7,7 +7,7 @@ local whitelisted = {
     ["owner"] = true,
     ["0001"] = true,
     ["xlpax"] = true,
-    ["0002"]
+    ["0002"] = true
 }
 
 local gui = Instance.new("ScreenGui")
