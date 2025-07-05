@@ -23,6 +23,7 @@ Main.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
 Main.BorderSizePixel = 0
 Main.AnchorPoint = Vector2.new(0.5, 0.5)
 Main.Parent = UI
+Main.Draggable = true
 Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
 
 local TopBar = Instance.new("Frame")
@@ -129,7 +130,6 @@ HubFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
 HubFrame.BorderSizePixel = 0
 HubFrame.Visible = false
 HubFrame.Parent = UI
-HubFrame.Draggable = true
 Instance.new("UICorner", HubFrame).CornerRadius = UDim.new(0, 10)
 
 local HubTopBar = Instance.new("Frame")
@@ -137,7 +137,6 @@ HubTopBar.Size = UDim2.new(1, 0, 0, 30)
 HubTopBar.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
 HubTopBar.BorderSizePixel = 0
 HubTopBar.Parent = HubFrame
-HubTopBar.Draggable = true
 Instance.new("UICorner", HubTopBar).CornerRadius = UDim.new(0, 10)
 
 local HubTitle = Instance.new("TextLabel")
@@ -314,58 +313,68 @@ ScriptHubBtn.MouseButton1Click:Connect(function()
 	HubFrame.Visible = not HubFrame.Visible
 end)
 
--- === DRAGGING ===
-local dragging = false
-local dragStart, startPos
+-- === IMPROVED DRAGGING ===
+local draggingMain = false
+local dragStartMain, startPosMain
+
 TopBar.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = true
-		dragStart = input.Position
-		startPos = Main.Position
-	end
-end)
-UserInputService.InputChanged:Connect(function(input)
-	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-		local delta = input.Position - dragStart
-		Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-	end
-end)
-UserInputService.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = false
+		draggingMain = true
+		dragStartMain = input.Position
+		startPosMain = Main.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				draggingMain = false
+			end
+		end)
 	end
 end)
 
--- === HUB FRAME DRAG ===
 local draggingHub = false
 local dragStartHub, startPosHub
-HubFrame.InputBegan:Connect(function(input)
+
+HubTopBar.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
 		draggingHub = true
 		dragStartHub = input.Position
 		startPosHub = HubFrame.Position
-	end
-end)
-UserInputService.InputChanged:Connect(function(input)
-	if draggingHub and input.UserInputType == Enum.UserInputType.MouseMovement then
-		local delta = input.Position - dragStartHub
-		HubFrame.Position = UDim2.new(startPosHub.X.Scale, startPosHub.X.Offset + delta.X, startPosHub.Y.Scale, startPosHub.Y.Offset + delta.Y)
-	end
-end)
-UserInputService.InputEnded:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		draggingHub = false
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				draggingHub = false
+			end
+		end)
 	end
 end)
 
--- === MINIMIZE & CLOSE ===
-local minimized = false
-MinBtn.MouseButton1Click:Connect(function()
-	minimized = not minimized
-	Editor.Visible = not minimized
-	ButtonHolder.Visible = not minimized
-	Main.Size = minimized and UDim2.new(0, 480, 0, 40) or UDim2.new(0, 480, 0, 340)
+UserInputService.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		if draggingMain then
+			local delta = input.Position - dragStartMain
+			Main.Position = UDim2.new(
+				startPosMain.X.Scale,
+				startPosMain.X.Offset + delta.X,
+				startPosMain.Y.Scale,
+				startPosMain.Y.Offset + delta.Y
+			)
+		elseif draggingHub then
+			local delta = input.Position - dragStartHub
+			HubFrame.Position = UDim2.new(
+				startPosHub.X.Scale,
+				startPosHub.X.Offset + delta.X,
+				startPosHub.Y.Scale,
+				startPosHub.Y.Offset + delta.Y
+			)
+		end
+	end
 end)
+
+-- === MINIMIZE & CLOSE BUTTONS ===
+MinBtn.MouseButton1Click:Connect(function()
+	Main.Size = UDim2.new(Main.Size.X.Scale, Main.Size.X.Offset, 0, 40)
+	Editor.Visible = false
+	ButtonHolder.Visible = false
+end)
+
 CloseBtn.MouseButton1Click:Connect(function()
 	UI:Destroy()
 end)
