@@ -255,13 +255,12 @@ end)()
 TabButtons.ScriptHub = (function()
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1, -20, 0, 44)
-    btn.Position = UDim2.new(0, 10, 0, 64)
+    btn.Position = UDim2.new(0, 10, 0, 60)
     btn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.Font = Enum.Font.GothamBold
     btn.TextSize = 16
     btn.Text = "Script Hub"
-    btn.Name = "Script Hub"
     btn.BorderSizePixel = 0
     btn.Parent = TabPanel
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
@@ -271,7 +270,7 @@ end)()
 TabButtons.Settings = (function()
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1, -20, 0, 44)
-    btn.Position = UDim2.new(0, 10, 0, 118)
+    btn.Position = UDim2.new(0, 10, 0, 110)
     btn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.Font = Enum.Font.GothamBold
@@ -283,36 +282,20 @@ TabButtons.Settings = (function()
     return btn
 end)()
 
-local selectedTabBtn
+local function selectTab(tabName)
+    TabButtons.Editor.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    TabButtons.ScriptHub.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    TabButtons.Settings.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
 
-function selectTab(name)
-    if selectedTabBtn then
-        TweenService:Create(selectedTabBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}):Play()
-    end
-    selectedTabBtn = nil
-    for _, btn in pairs(TabButtons) do
-        if btn.Text == name then
-            selectedTabBtn = btn
-            TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(60, 130, 230)}):Play()
-        else
-            TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 40, 50)}):Play()
-        end
-    end
-    EditorFrame.Visible = name == "Editor"
-    ScriptHubFrame.Visible = name == "Script Hub"
-    SettingsFrame.Visible = name == "Settings"
+    TabButtons[tabName].BackgroundColor3 = Color3.fromRGB(70, 70, 90)
+
+    EditorFrame.Visible = (tabName == "Editor")
+    ScriptHubFrame.Visible = (tabName == "ScriptHub")
+    SettingsFrame.Visible = (tabName == "Settings")
 end
 
 selectTab("Editor")
 populateScriptHub()
-
-local useFunction = false
-
-ToggleMethodBtn.Text = "USE EVT"
-ToggleMethodBtn.MouseButton1Click:Connect(function()
-    useFunction = not useFunction
-    ToggleMethodBtn.Text = useFunction and "USE FUNC" or "USE EVT"
-end)
 
 CloseBtn.MouseButton1Click:Connect(function()
     UI:Destroy()
@@ -320,6 +303,17 @@ end)
 
 ClearBtn.MouseButton1Click:Connect(function()
     Editor.Text = ""
+end)
+
+local useFunction = false
+ToggleMethodBtn.Text = "Use RemoteEvent"
+ToggleMethodBtn.MouseButton1Click:Connect(function()
+    useFunction = not useFunction
+    if useFunction then
+        ToggleMethodBtn.Text = "Use RemoteFunction"
+    else
+        ToggleMethodBtn.Text = "Use RemoteEvent"
+    end
 end)
 
 ExecuteBtn.MouseButton1Click:Connect(function()
@@ -331,36 +325,44 @@ ExecuteBtn.MouseButton1Click:Connect(function()
     StatusText.TextColor3 = Color3.fromRGB(255, 255, 255)
     StatusText.Text = "Executing..."
     StatusText.Parent = EditorFrame
+
     local scriptText = Editor.Text
     local success = false
+
     if not useFunction then
         local evt = ReplicatedStorage:FindFirstChild("RemoteEvent")
-        if evt then
-            pcall(function()
+        if evt and evt:IsA("RemoteEvent") then
+            local ok, err = pcall(function()
                 evt:FireServer(scriptText)
-                success = true
-                StatusText.Text = "Sent via RemoteEvent!"
             end)
+            if ok then
+                StatusText.Text = "Sent via RemoteEvent!"
+                success = true
+            else
+                StatusText.Text = "RemoteEvent error: "..tostring(err)
+            end
         end
     end
+
     if not success then
         local fn = ReplicatedStorage:FindFirstChild("RemoteExecutor")
-        if fn then
-            local result
-            local ok, err = pcall(function()
-                result = fn:InvokeServer(scriptText)
+        if fn and fn:IsA("RemoteFunction") then
+            local ok, result = pcall(function()
+                return fn:InvokeServer(scriptText)
             end)
             if ok then
                 StatusText.Text = tostring(result or "Executed via RemoteFunction")
                 success = true
             else
-                StatusText.Text = "RemoteFunction error: "..tostring(err)
+                StatusText.Text = "RemoteFunction error: "..tostring(result)
             end
         end
     end
+
     if not success then
         StatusText.Text = "No valid remote found"
     end
+
     wait(2)
     StatusText:Destroy()
 end)
