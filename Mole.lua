@@ -313,66 +313,75 @@ ScriptHubBtn.MouseButton1Click:Connect(function()
 	HubFrame.Visible = not HubFrame.Visible
 end)
 
--- === IMPROVED DRAGGING ===
-local draggingMain = false
-local dragStartMain, startPosMain
+-- === FULL DRAGGABLE FUNCTION ===
+local function makeFullyDraggable(frame)
+    frame.Active = true
 
-TopBar.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		draggingMain = true
-		dragStartMain = input.Position
-		startPosMain = Main.Position
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				draggingMain = false
-			end
-		end)
-	end
-end)
+    local dragging = false
+    local dragStart
+    local startPos
 
-local draggingHub = false
-local dragStartHub, startPosHub
+    local function onInputBegan(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end
 
-HubTopBar.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		draggingHub = true
-		dragStartHub = input.Position
-		startPosHub = HubFrame.Position
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				draggingHub = false
-			end
-		end)
-	end
-end)
+    local function onInputChanged(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end
 
-UserInputService.InputChanged:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement then
-		if draggingMain then
-			local delta = input.Position - dragStartMain
-			Main.Position = UDim2.new(
-				startPosMain.X.Scale,
-				startPosMain.X.Offset + delta.X,
-				startPosMain.Y.Scale,
-				startPosMain.Y.Offset + delta.Y
-			)
-		elseif draggingHub then
-			local delta = input.Position - dragStartHub
-			HubFrame.Position = UDim2.new(
-				startPosHub.X.Scale,
-				startPosHub.X.Offset + delta.X,
-				startPosHub.Y.Scale,
-				startPosHub.Y.Offset + delta.Y
-			)
-		end
-	end
-end)
+    -- Connect for frame itself
+    frame.InputBegan:Connect(onInputBegan)
+    frame.InputChanged:Connect(onInputChanged)
 
--- === MINIMIZE & CLOSE BUTTONS ===
+    -- Connect for all existing descendants (to drag when clicking anywhere)
+    for _, child in ipairs(frame:GetDescendants()) do
+        if child:IsA("GuiObject") then
+            child.InputBegan:Connect(onInputBegan)
+            child.InputChanged:Connect(onInputChanged)
+        end
+    end
+
+    -- Connect for any descendants added later
+    frame.DescendantAdded:Connect(function(child)
+        if child:IsA("GuiObject") then
+            child.InputBegan:Connect(onInputBegan)
+            child.InputChanged:Connect(onInputChanged)
+        end
+    end)
+end
+
+-- Apply draggable to Main and HubFrame
+makeFullyDraggable(Main)
+makeFullyDraggable(HubFrame)
+
+-- === BUTTONS MINIMIZE AND CLOSE ===
 MinBtn.MouseButton1Click:Connect(function()
-	Main.Size = UDim2.new(Main.Size.X.Scale, Main.Size.X.Offset, 0, 40)
-	Editor.Visible = false
-	ButtonHolder.Visible = false
+	if Main.Size.Y.Offset > 40 then
+		TweenService:Create(Main, TweenInfo.new(0.2), {Size = UDim2.new(Main.Size.X.Scale, Main.Size.X.Offset, 0, 40)}):Play()
+		Editor.Visible = false
+		ButtonHolder.Visible = false
+	else
+		TweenService:Create(Main, TweenInfo.new(0.2), {Size = UDim2.new(Main.Size.X.Scale, Main.Size.X.Offset, 0, 340)}):Play()
+		Editor.Visible = true
+		ButtonHolder.Visible = true
+	end
 end)
 
 CloseBtn.MouseButton1Click:Connect(function()
